@@ -81,6 +81,6 @@ All seeded accounts use password `password`.
 
 ## Notes
 
-- The original `er_drill_schema.sql` remains in the repo as the source reference that guided the Laravel/MySQL schema.
+- The Laravel migrations are the source of truth for the current application schema.
 - Attachment files are stored on the `public` disk in `storage/app/public/drills/...`.
 - Workflow emails use Laravel notifications, so configure SMTP or keep `MAIL_MAILER=log` during local development.
