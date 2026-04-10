@@ -45,6 +45,7 @@ class EditorPage extends Component
     public array $events = [];
     public array $actions = [];
     public array $newAttachments = [];
+    public array $newAttachmentCaptions = [];
     public ?string $reviewComments = null;
 
     public function mount(?DrillRecord $drillRecord = null): void
@@ -111,6 +112,20 @@ class EditorPage extends Component
         $this->drillRecord->refresh()->load('attachments');
     }
 
+    public function addNewAttachment(): void
+    {
+        $this->newAttachments[] = null;
+        $this->newAttachmentCaptions[] = '';
+    }
+
+    public function removeNewAttachment(int $index): void
+    {
+        unset($this->newAttachments[$index], $this->newAttachmentCaptions[$index]);
+
+        $this->newAttachments = array_values($this->newAttachments);
+        $this->newAttachmentCaptions = array_values($this->newAttachmentCaptions);
+    }
+
     public function resetForm(): void
     {
         abort_unless($this->drillRecord ? $this->drillRecord->isEditableBy(auth()->user()) : Gate::allows('create', DrillRecord::class), 403);
@@ -134,6 +149,7 @@ class EditorPage extends Component
         $this->events = [];
         $this->actions = [];
         $this->newAttachments = [];
+        $this->newAttachmentCaptions = [];
 
         $this->addEvent();
         $this->addAction();
@@ -260,7 +276,7 @@ class EditorPage extends Component
             'improvementOpportunities' => ['nullable', 'string'],
             'otherComments' => ['nullable', 'string'],
             'events' => ['array'],
-            'events.*.event_time' => ['nullable', 'string', 'max:50'],
+            'events.*.event_time' => ['nullable', 'date_format:H:i'],
             'events.*.event_description' => ['nullable', 'string'],
             'actions' => ['array'],
             'actions.*.action_description' => ['nullable', 'string'],
@@ -268,7 +284,9 @@ class EditorPage extends Component
             'actions.*.action_status_id' => ['nullable', 'exists:action_statuses,id'],
             'actions.*.due_date' => ['nullable', 'date'],
             'newAttachments' => ['array'],
-            'newAttachments.*' => ['file', 'max:10240'],
+            'newAttachments.*' => ['nullable', 'image', 'max:1536'],
+            'newAttachmentCaptions' => ['array'],
+            'newAttachmentCaptions.*' => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -334,12 +352,18 @@ class EditorPage extends Component
                 ]);
             });
 
-        foreach ($this->newAttachments as $upload) {
+        foreach ($this->newAttachments as $index => $upload) {
+            if (! $upload) {
+                continue;
+            }
+
             $path = $upload->store("drills/{$record->id}", 'public');
 
             DrillAttachment::query()->create([
                 'drill_record_id' => $record->id,
-                'caption' => pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME),
+                'caption' => blank($this->newAttachmentCaptions[$index] ?? null)
+                    ? pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME)
+                    : trim($this->newAttachmentCaptions[$index]),
                 'file_path' => $path,
                 'file_name' => $upload->getClientOriginalName(),
                 'file_size_kb' => (int) ceil($upload->getSize() / 1024),
@@ -349,6 +373,7 @@ class EditorPage extends Component
         }
 
         $this->newAttachments = [];
+        $this->newAttachmentCaptions = [];
     }
 
     private function fillFromModel(DrillRecord $record): void

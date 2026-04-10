@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Enums\UserRole;
+use App\Livewire\Drills\EditorPage;
+use App\Models\DrillAttachment;
 use App\Models\DrillRecord;
 use App\Models\DrillStatus;
 use App\Models\DrillType;
@@ -11,6 +13,9 @@ use App\Models\Rig;
 use App\Models\User;
 use App\Services\DrillWorkflowService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class DrillWorkflowTest extends TestCase
@@ -54,5 +59,79 @@ class DrillWorkflowTest extends TestCase
 
         $this->assertTrue($be->canAccessRig($rigA->id));
         $this->assertFalse($be->canAccessRig($rigB->id));
+    }
+
+    public function test_sto_can_save_a_captioned_image_attachment(): void
+    {
+        Storage::fake('public');
+
+        [$rig, $sto, $drillType, $eventType] = $this->drillFormContext();
+
+        $this->actingAs($sto);
+
+        Livewire::test(EditorPage::class)
+            ->set('rigId', $rig->id)
+            ->set('drillTypeId', $drillType->id)
+            ->set('eventTypeId', $eventType->id)
+            ->call('addNewAttachment')
+            ->set('newAttachments.0', UploadedFile::fake()->image('vantris-logo.png')->size(512))
+            ->set('newAttachmentCaptions.0', 'Updated Vantris logo')
+            ->call('saveDraft')
+            ->assertHasNoErrors();
+
+        $attachment = DrillAttachment::query()->firstOrFail();
+
+        $this->assertSame('Updated Vantris logo', $attachment->caption);
+        $this->assertSame('vantris-logo.png', $attachment->file_name);
+        $this->assertNotNull($attachment->mime_type);
+        Storage::disk('public')->assertExists($attachment->file_path);
+    }
+
+    public function test_non_image_attachments_are_rejected(): void
+    {
+        Storage::fake('public');
+
+        [$rig, $sto, $drillType, $eventType] = $this->drillFormContext();
+
+        $this->actingAs($sto);
+
+        Livewire::test(EditorPage::class)
+            ->set('rigId', $rig->id)
+            ->set('drillTypeId', $drillType->id)
+            ->set('eventTypeId', $eventType->id)
+            ->call('addNewAttachment')
+            ->set('newAttachments.0', UploadedFile::fake()->create('checklist.pdf', 200, 'application/pdf'))
+            ->set('newAttachmentCaptions.0', 'Checklist')
+            ->call('saveDraft')
+            ->assertHasErrors(['newAttachments.0' => 'image']);
+    }
+
+    public function test_oversized_image_attachments_are_rejected(): void
+    {
+        Storage::fake('public');
+
+        [$rig, $sto, $drillType, $eventType] = $this->drillFormContext();
+
+        $this->actingAs($sto);
+
+        Livewire::test(EditorPage::class)
+            ->set('rigId', $rig->id)
+            ->set('drillTypeId', $drillType->id)
+            ->set('eventTypeId', $eventType->id)
+            ->call('addNewAttachment')
+            ->set('newAttachments.0', UploadedFile::fake()->image('oversized.png')->size(1600))
+            ->set('newAttachmentCaptions.0', 'Oversized image')
+            ->call('saveDraft')
+            ->assertHasErrors(['newAttachments.0' => 'max']);
+    }
+
+    private function drillFormContext(): array
+    {
+        $rig = Rig::factory()->create();
+        $sto = User::factory()->create(['role' => UserRole::STO->value, 'rig_id' => $rig->id]);
+        $drillType = DrillType::query()->create(['name' => 'Fire Drill', 'is_active' => true]);
+        $eventType = EventType::query()->create(['name' => 'Fire', 'is_active' => true]);
+
+        return [$rig, $sto, $drillType, $eventType];
     }
 }

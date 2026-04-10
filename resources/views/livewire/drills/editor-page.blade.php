@@ -126,7 +126,7 @@
                 <div class="mt-5 space-y-4">
                     @foreach ($events as $index => $event)
                         <div wire:key="event-{{ $index }}" class="grid gap-4 rounded-3xl border border-stone-200 bg-stone-50 p-4 md:grid-cols-[160px_1fr_auto]">
-                            <input wire:model="events.{{ $index }}.event_time" type="text" placeholder="14:35" class="rounded-2xl border-stone-300 bg-white text-sm" @disabled(! $editable)>
+                            <input wire:model="events.{{ $index }}.event_time" type="time" class="rounded-2xl border-stone-300 bg-white text-sm" @disabled(! $editable)>
                             <textarea wire:model="events.{{ $index }}.event_description" rows="2" placeholder="Describe the event" class="rounded-2xl border-stone-300 bg-white text-sm" @disabled(! $editable)></textarea>
                             @if ($editable)
                                 <button wire:click="removeEvent({{ $index }})" type="button" class="rounded-full border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-700">Remove</button>
@@ -170,16 +170,42 @@
                 <div class="flex items-center justify-between">
                     <h2 class="text-xl font-bold text-stone-950">Attachments</h2>
                     @if ($editable)
-                        <input wire:model="newAttachments" type="file" multiple class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
+                        <button wire:click="addNewAttachment" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700">Add Attachment</button>
                     @endif
                 </div>
-                @error('newAttachments.*') <div class="mt-3 text-sm text-rose-600">{{ $message }}</div> @enderror
+
+                @if ($editable)
+                    <p class="mt-3 text-sm text-stone-500">Upload image attachments only. Maximum file size: 1.5 MB each.</p>
+
+                    <div class="mt-5 space-y-4">
+                        @foreach ($newAttachments as $index => $upload)
+                            <div wire:key="new-attachment-{{ $index }}" class="grid gap-4 rounded-3xl border border-stone-200 bg-stone-50 p-4 md:grid-cols-[1fr_1fr_auto]">
+                                <div>
+                                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Image File</label>
+                                    <input wire:model="newAttachments.{{ $index }}" type="file" accept="image/*" class="mt-2 w-full rounded-2xl border-stone-300 bg-white text-sm">
+                                    @error('newAttachments.' . $index) <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Caption</label>
+                                    <input wire:model="newAttachmentCaptions.{{ $index }}" type="text" placeholder="Describe this image" class="mt-2 w-full rounded-2xl border-stone-300 bg-white text-sm">
+                                    @error('newAttachmentCaptions.' . $index) <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                                </div>
+                                <div class="flex items-end justify-end">
+                                    <button wire:click="removeNewAttachment({{ $index }})" type="button" class="rounded-full border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-700">Remove</button>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
 
                 <div class="mt-5 space-y-3">
                     @foreach ($record?->attachments ?? [] as $attachment)
                         <div class="flex flex-col gap-3 rounded-3xl border border-stone-200 bg-stone-50 p-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <div class="font-semibold text-stone-900">{{ $attachment->file_name }}</div>
+                                @if ($attachment->caption)
+                                    <div class="mt-1 text-sm text-stone-600">{{ $attachment->caption }}</div>
+                                @endif
                                 <div class="text-xs uppercase tracking-[0.18em] text-stone-500">{{ $attachment->mime_type }} · {{ $attachment->file_size_kb }} KB</div>
                             </div>
                             <div class="flex gap-2">
@@ -190,9 +216,9 @@
                             </div>
                         </div>
                     @endforeach
-                    @if (($record?->attachments?->count() ?? 0) === 0)
+                    @if (($record?->attachments?->count() ?? 0) === 0 && count($newAttachments) === 0)
                         <div class="rounded-3xl border border-dashed border-stone-300 bg-stone-50 p-6 text-sm text-stone-500">
-                            No attachments uploaded yet.
+                            No attachments added yet.
                         </div>
                     @endif
                 </div>
