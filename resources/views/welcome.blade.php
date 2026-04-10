@@ -11,8 +11,8 @@
     <body class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.15),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(217,119,6,0.18),_transparent_26%),linear-gradient(180deg,_#faf7f2_0%,_#f5efe4_55%,_#efe2ce_100%)] text-stone-900" style="font-family: Manrope, sans-serif;">
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <x-application-logo class="h-12 w-12" />
+                <div class="flex items-center gap-4">
+                    <x-application-logo class="h-12 w-auto max-w-[12rem]" />
                     <div>
                         <div class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500">ER Drill</div>
                         <div class="text-lg font-bold text-stone-900">Management</div>
@@ -35,7 +35,6 @@
                     </p>
                     <div class="mt-8 flex flex-wrap gap-4">
                         <a href="{{ route('login') }}" class="rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-stone-900/15">Open Login</a>
-                        <a href="#features" class="rounded-full border border-stone-300 px-6 py-3 text-sm font-semibold text-stone-700">Explore Features</a>
                     </div>
                 </div>
 
@@ -85,6 +84,7 @@
                     <p class="mt-3 text-sm leading-7 text-stone-600">RM and Management get filtered dashboards, overdue action tracking, and export-ready reporting across rigs.</p>
                 </div>
             </section>
+
         </div>
     </body>
 </html>

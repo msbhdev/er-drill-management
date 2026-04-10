@@ -68,5 +68,9 @@ new #[Layout('layouts.guest')] class extends Component
         <x-primary-button class="w-full justify-center rounded-2xl bg-stone-900 px-5 py-3 text-sm font-semibold text-white shadow-xl shadow-stone-900/20 hover:bg-stone-800">
                 {{ __('Log in') }}
         </x-primary-button>
+
+        <a href="{{ url('/') }}" wire:navigate class="block w-full rounded-2xl border border-stone-300 px-5 py-3 text-center text-sm font-semibold text-stone-700 transition hover:border-stone-900 hover:text-stone-900">
+            Cancel
+        </a>
     </form>
 </div>

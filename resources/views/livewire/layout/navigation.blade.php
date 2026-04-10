@@ -19,8 +19,8 @@ new class extends Component
 <nav x-data="{ open: false }" class="sticky top-0 z-40 border-b border-stone-200/80 bg-white/85 backdrop-blur">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <div class="flex items-center gap-4">
-            <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-3">
-                <x-application-logo class="h-11 w-11" />
+            <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-4">
+                <x-application-logo class="h-10 w-auto max-w-[10rem]" />
                 <div>
                     <div class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500">ER Drill</div>
                     <div class="text-sm font-bold text-stone-900">Management</div>

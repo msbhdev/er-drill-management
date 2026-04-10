@@ -45,8 +45,8 @@
                 </div>
 
                 <div class="w-full rounded-[2rem] border border-white/10 bg-white p-8 shadow-2xl shadow-black/30">
-                    <a href="/" wire:navigate class="mb-8 flex items-center gap-3">
-                        <x-application-logo class="h-14 w-14" />
+                    <a href="/" wire:navigate class="mb-8 flex items-center gap-4">
+                        <x-application-logo class="h-14 w-auto max-w-[13rem]" />
                         <div>
                             <div class="text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">ER Drill Management</div>
                             <div class="text-lg font-bold text-stone-900">Sign in to continue</div>
