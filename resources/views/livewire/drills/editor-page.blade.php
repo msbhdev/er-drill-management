@@ -199,8 +199,8 @@
             </section>
         </div>
 
-        <div class="space-y-6">
-            <section class="rounded-[2rem] border border-stone-900/10 bg-stone-950 p-6 text-white shadow-xl shadow-stone-900/20">
+        <div class="space-y-6 xl:self-start">
+            <section class="rounded-[2rem] border border-stone-900/10 bg-stone-950 p-6 text-white shadow-xl shadow-stone-900/20 xl:sticky xl:top-24">
                 <h2 class="text-xl font-bold">Workflow Actions</h2>
                 <p class="mt-2 text-sm leading-6 text-stone-300">Only the role assigned to the current workflow step can progress or return the record.</p>
 
@@ -223,6 +223,9 @@
 
                 <div class="mt-6 space-y-3">
                     @if ($editable)
+                        <button wire:click="resetForm" type="button" class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+                            Reset Form
+                        </button>
                         <button wire:click="saveDraft" type="button" class="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white">
                             Save Draft
                         </button>

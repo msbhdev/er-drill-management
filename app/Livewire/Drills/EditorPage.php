@@ -111,6 +111,36 @@ class EditorPage extends Component
         $this->drillRecord->refresh()->load('attachments');
     }
 
+    public function resetForm(): void
+    {
+        abort_unless($this->drillRecord ? $this->drillRecord->isEditableBy(auth()->user()) : Gate::allows('create', DrillRecord::class), 403);
+
+        $this->drillTypeId = null;
+        $this->eventTypeId = null;
+        $this->drillDate = null;
+        $this->drillTime = null;
+        $this->onDutyCrews = null;
+        $this->eventLocation = null;
+        $this->scenario = null;
+        $this->applicableDsha = null;
+        $this->performanceStandard = null;
+        $this->performanceStandardsMet = null;
+        $this->objectives = null;
+        $this->debriefAttendees = null;
+        $this->positiveObservations = null;
+        $this->improvementOpportunities = null;
+        $this->otherComments = null;
+        $this->reviewComments = null;
+        $this->events = [];
+        $this->actions = [];
+        $this->newAttachments = [];
+
+        $this->addEvent();
+        $this->addAction();
+        $this->resetErrorBag();
+        $this->resetValidation();
+    }
+
     public function saveDraft(DrillWorkflowService $workflowService): void
     {
         $record = $this->persistDraft($workflowService);
