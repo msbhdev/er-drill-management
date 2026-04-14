@@ -20,7 +20,9 @@ class SettingsPage extends Component
 
     protected string $paginationTheme = 'tailwind';
 
-    public int $recordsPerPage = 5;
+    public string $userRecordsPerPage = '5';
+    public string $drillTypeRecordsPerPage = '5';
+    public string $eventTypeRecordsPerPage = '5';
 
     public ?int $editingUserId = null;
     public ?int $editingRigId = null;
@@ -347,21 +349,45 @@ class SettingsPage extends Component
         $status->update(['is_active' => ! $status->is_active]);
     }
 
+    public function updatedUserRecordsPerPage(): void
+    {
+        $this->resetPage('usersPage');
+    }
+
+    public function updatedDrillTypeRecordsPerPage(): void
+    {
+        $this->resetPage('drillTypesPage');
+    }
+
+    public function updatedEventTypeRecordsPerPage(): void
+    {
+        $this->resetPage('eventTypesPage');
+    }
+
     public function render()
     {
+        $userQuery = User::query()
+            ->with('rig')
+            ->orderBy('role')
+            ->orderBy('full_name');
+
+        $drillTypeQuery = DrillType::query()->orderBy('name');
+        $eventTypeQuery = EventType::query()->orderBy('name');
+
         return view('livewire.admin.settings-page', [
-            'users' => User::query()
-                ->with('rig')
-                ->orderBy('role')
-                ->orderBy('full_name')
-                ->paginate($this->recordsPerPage, pageName: 'usersPage'),
+            'users' => $userQuery->paginate(
+                $this->resolvePerPage($userQuery->toBase()->getCountForPagination(), $this->userRecordsPerPage),
+                pageName: 'usersPage'
+            ),
             'rigs' => Rig::query()->orderBy('name')->get(),
-            'drillTypes' => DrillType::query()
-                ->orderBy('name')
-                ->paginate($this->recordsPerPage, pageName: 'drillTypesPage'),
-            'eventTypes' => EventType::query()
-                ->orderBy('name')
-                ->paginate($this->recordsPerPage, pageName: 'eventTypesPage'),
+            'drillTypes' => $drillTypeQuery->paginate(
+                $this->resolvePerPage($drillTypeQuery->toBase()->getCountForPagination(), $this->drillTypeRecordsPerPage),
+                pageName: 'drillTypesPage'
+            ),
+            'eventTypes' => $eventTypeQuery->paginate(
+                $this->resolvePerPage($eventTypeQuery->toBase()->getCountForPagination(), $this->eventTypeRecordsPerPage),
+                pageName: 'eventTypesPage'
+            ),
             'drillStatuses' => DrillStatus::query()->orderBy('sort_order')->get(),
             'actionStatuses' => ActionStatus::query()->orderBy('sort_order')->get(),
         ])->layout('layouts.app');
@@ -399,5 +425,14 @@ class SettingsPage extends Component
             'role' => $user->role,
             'effective_from' => now()->toDateString(),
         ]);
+    }
+
+    private function resolvePerPage(int $total, string $setting): int
+    {
+        if ($setting === 'all') {
+            return max($total, 1);
+        }
+
+        return (int) $setting;
     }
 }

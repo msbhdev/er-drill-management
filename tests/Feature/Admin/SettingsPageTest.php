@@ -94,6 +94,30 @@ class SettingsPageTest extends TestCase
             ->assertDontSee('User 06');
     }
 
+    public function test_admin_can_expand_user_accounts_list_to_show_all_records(): void
+    {
+        $admin = User::factory()->create([
+            'full_name' => 'Admin User',
+            'role' => UserRole::Administrator->value,
+            'rig_id' => null,
+        ]);
+
+        foreach (range(1, 6) as $index) {
+            User::factory()->create([
+                'full_name' => sprintf('User %02d', $index),
+                'email' => sprintf('all-user%02d@example.com', $index),
+                'role' => UserRole::STO->value,
+            ]);
+        }
+
+        $this->actingAs($admin);
+
+        Livewire::test(SettingsPage::class)
+            ->set('userRecordsPerPage', 'all')
+            ->assertSee('User 05')
+            ->assertSee('User 06');
+    }
+
     public function test_administrator_can_edit_and_delete_a_drill_type(): void
     {
         $admin = User::factory()->create([

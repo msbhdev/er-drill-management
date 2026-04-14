@@ -60,42 +60,56 @@
         </section>
 
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
-            <h2 class="text-xl font-bold text-stone-950">User Accounts</h2>
-            <div class="mt-5 max-h-[22.5rem] overflow-auto rounded-3xl border border-stone-200">
-                <table class="min-w-full divide-y divide-stone-200 text-sm">
-                    <thead class="sticky top-0 bg-white/95 backdrop-blur">
-                        <tr class="text-left text-stone-500">
-                            <th class="pb-3 font-semibold">User</th>
-                            <th class="pb-3 font-semibold">Role</th>
-                            <th class="pb-3 font-semibold">Rig</th>
-                            <th class="pb-3 font-semibold">Status</th>
-                            <th class="pb-3"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-stone-100">
-                        @foreach ($users as $user)
-                            <tr>
-                                <td class="py-4">
-                                    <div class="font-semibold text-stone-900">{{ $user->full_name }}</div>
-                                    <div class="text-xs text-stone-500">{{ $user->email }}</div>
-                                </td>
-                                <td class="py-4">{{ $user->role }}</td>
-                                <td class="py-4">{{ $user->rig?->name ?? 'All rigs' }}</td>
-                                <td class="py-4">
-                                    <span class="rounded-full {{ $user->active_status ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }} px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
-                                        {{ $user->active_status ? 'Active' : 'Disabled' }}
-                                    </span>
-                                </td>
-                                <td class="py-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button wire:click="editUser({{ $user->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Edit</button>
-                                        <button wire:click="toggleUserActive({{ $user->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Toggle</button>
-                                    </div>
-                                </td>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 class="text-xl font-bold text-stone-950">User Accounts</h2>
+                <label class="flex items-center gap-3 text-sm text-stone-600">
+                    <span>Show</span>
+                    <select wire:model.live="userRecordsPerPage" class="rounded-full border-stone-300 bg-white px-4 py-2 text-sm">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                        <option value="all">All</option>
+                    </select>
+                </label>
+            </div>
+            <div class="mt-5 overflow-hidden rounded-3xl border border-stone-200 bg-white">
+                <div class="max-h-[22.5rem] overflow-auto">
+                    <table class="min-w-full divide-y divide-stone-200 text-sm">
+                        <thead class="sticky top-0 bg-white/95 backdrop-blur">
+                            <tr class="text-left text-stone-500">
+                                <th class="px-5 pb-3 pt-4 font-semibold">User</th>
+                                <th class="px-4 pb-3 pt-4 font-semibold">Role</th>
+                                <th class="px-4 pb-3 pt-4 font-semibold">Rig</th>
+                                <th class="px-4 pb-3 pt-4 font-semibold">Status</th>
+                                <th class="px-5 pb-3 pt-4"></th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-stone-100">
+                            @foreach ($users as $user)
+                                <tr class="bg-white">
+                                    <td class="px-5 py-4">
+                                        <div class="font-semibold text-stone-900">{{ $user->full_name }}</div>
+                                        <div class="text-xs text-stone-500">{{ $user->email }}</div>
+                                    </td>
+                                    <td class="px-4 py-4">{{ $user->role }}</td>
+                                    <td class="px-4 py-4">{{ $user->rig?->name ?? 'All rigs' }}</td>
+                                    <td class="px-4 py-4">
+                                        <span class="rounded-full {{ $user->active_status ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }} px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
+                                            {{ $user->active_status ? 'Active' : 'Disabled' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-4 text-right">
+                                        <div class="flex justify-end gap-2">
+                                            <button wire:click="editUser({{ $user->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Edit</button>
+                                            <button wire:click="toggleUserActive({{ $user->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Toggle</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="mt-4">
                 {{ $users->links() }}
@@ -142,7 +156,19 @@
         </section>
 
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
-            <h2 class="text-xl font-bold text-stone-950">{{ $editingDrillTypeId ? 'Edit Drill Type' : 'Drill Types' }}</h2>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 class="text-xl font-bold text-stone-950">{{ $editingDrillTypeId ? 'Edit Drill Type' : 'Drill Types' }}</h2>
+                <label class="flex items-center gap-3 text-sm text-stone-600">
+                    <span>Show</span>
+                    <select wire:model.live="drillTypeRecordsPerPage" class="rounded-full border-stone-300 bg-white px-4 py-2 text-sm">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                        <option value="all">All</option>
+                    </select>
+                </label>
+            </div>
             <div class="mt-5 grid gap-4">
                 <input wire:model="drillTypeName" type="text" placeholder="Drill type name" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
                 @error('drillTypeName') <div class="text-sm text-rose-600">{{ $message }}</div> @enderror
@@ -178,7 +204,19 @@
         </section>
 
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
-            <h2 class="text-xl font-bold text-stone-950">{{ $editingEventTypeId ? 'Edit Event Type' : 'Event Types' }}</h2>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 class="text-xl font-bold text-stone-950">{{ $editingEventTypeId ? 'Edit Event Type' : 'Event Types' }}</h2>
+                <label class="flex items-center gap-3 text-sm text-stone-600">
+                    <span>Show</span>
+                    <select wire:model.live="eventTypeRecordsPerPage" class="rounded-full border-stone-300 bg-white px-4 py-2 text-sm">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="30">30</option>
+                        <option value="50">50</option>
+                        <option value="all">All</option>
+                    </select>
+                </label>
+            </div>
             <div class="mt-5 grid gap-4">
                 <input wire:model="eventTypeName" type="text" placeholder="Event type name" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
                 @error('eventTypeName') <div class="text-sm text-rose-600">{{ $message }}</div> @enderror
