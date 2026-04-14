@@ -68,6 +68,32 @@ class SettingsPageTest extends TestCase
         $this->assertFalse($rig->is_active);
     }
 
+    public function test_user_accounts_list_is_paginated_to_five_records(): void
+    {
+        $admin = User::factory()->create([
+            'full_name' => 'Admin User',
+            'role' => UserRole::Administrator->value,
+            'rig_id' => null,
+        ]);
+
+        foreach (range(1, 6) as $index) {
+            User::factory()->create([
+                'full_name' => sprintf('User %02d', $index),
+                'email' => sprintf('user%02d@example.com', $index),
+                'role' => UserRole::STO->value,
+            ]);
+        }
+
+        $this->actingAs($admin);
+
+        Livewire::test(SettingsPage::class)
+            ->assertSee('Admin User')
+            ->assertSee('User 01')
+            ->assertSee('User 04')
+            ->assertDontSee('User 05')
+            ->assertDontSee('User 06');
+    }
+
     public function test_administrator_can_edit_and_delete_a_drill_type(): void
     {
         $admin = User::factory()->create([

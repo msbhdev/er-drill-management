@@ -97,6 +97,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">
+                {{ $users->links() }}
+            </div>
         </section>
     </div>
 
@@ -169,6 +172,9 @@
                     </div>
                 @endforeach
             </div>
+            <div class="mt-4">
+                {{ $drillTypes->links() }}
+            </div>
         </section>
 
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
@@ -201,6 +207,9 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+            <div class="mt-4">
+                {{ $eventTypes->links() }}
             </div>
         </section>
 

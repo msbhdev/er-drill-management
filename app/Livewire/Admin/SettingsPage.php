@@ -12,9 +12,16 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class SettingsPage extends Component
 {
+    use WithPagination;
+
+    protected string $paginationTheme = 'tailwind';
+
+    public int $recordsPerPage = 5;
+
     public ?int $editingUserId = null;
     public ?int $editingRigId = null;
     public string $userFullName = '';
@@ -89,6 +96,7 @@ class SettingsPage extends Component
         }
 
         $this->resetUserForm();
+        $this->resetPage('usersPage');
         session()->flash('status', 'User saved successfully.');
     }
 
@@ -178,6 +186,7 @@ class SettingsPage extends Component
         }
 
         $this->resetDrillTypeForm();
+        $this->resetPage('drillTypesPage');
         session()->flash('status', 'Drill type saved successfully.');
     }
 
@@ -211,6 +220,7 @@ class SettingsPage extends Component
             $this->resetDrillTypeForm();
         }
 
+        $this->resetPage('drillTypesPage');
         session()->flash('status', 'Drill type deleted successfully.');
     }
 
@@ -235,6 +245,7 @@ class SettingsPage extends Component
         }
 
         $this->resetEventTypeForm();
+        $this->resetPage('eventTypesPage');
         session()->flash('status', 'Event type saved successfully.');
     }
 
@@ -268,6 +279,7 @@ class SettingsPage extends Component
             $this->resetEventTypeForm();
         }
 
+        $this->resetPage('eventTypesPage');
         session()->flash('status', 'Event type deleted successfully.');
     }
 
@@ -338,10 +350,18 @@ class SettingsPage extends Component
     public function render()
     {
         return view('livewire.admin.settings-page', [
-            'users' => User::query()->with('rig')->orderBy('role')->orderBy('full_name')->get(),
+            'users' => User::query()
+                ->with('rig')
+                ->orderBy('role')
+                ->orderBy('full_name')
+                ->paginate($this->recordsPerPage, pageName: 'usersPage'),
             'rigs' => Rig::query()->orderBy('name')->get(),
-            'drillTypes' => DrillType::query()->orderBy('name')->get(),
-            'eventTypes' => EventType::query()->orderBy('name')->get(),
+            'drillTypes' => DrillType::query()
+                ->orderBy('name')
+                ->paginate($this->recordsPerPage, pageName: 'drillTypesPage'),
+            'eventTypes' => EventType::query()
+                ->orderBy('name')
+                ->paginate($this->recordsPerPage, pageName: 'eventTypesPage'),
             'drillStatuses' => DrillStatus::query()->orderBy('sort_order')->get(),
             'actionStatuses' => ActionStatus::query()->orderBy('sort_order')->get(),
         ])->layout('layouts.app');
