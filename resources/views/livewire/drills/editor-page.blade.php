@@ -188,7 +188,7 @@
                             <div wire:key="new-attachment-{{ $index }}" class="grid gap-4 rounded-3xl border border-stone-200 bg-stone-50 p-4 md:grid-cols-[1fr_1fr_auto]">
                                 <div>
                                     <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Image File</label>
-                                    <input wire:model="newAttachments.{{ $index }}" type="file" accept="image/*" class="mt-2 w-full rounded-2xl border-stone-300 bg-white text-sm">
+                                    <input wire:model="newAttachments.{{ $index }}" type="file" accept="image/*" class="mt-2 block w-full cursor-pointer rounded-2xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-600 file:mr-4 file:rounded-full file:border-0 file:bg-stone-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-stone-800">
                                     @error('newAttachments.' . $index) <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                                 </div>
                                 <div>
