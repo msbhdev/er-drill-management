@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DrillRecord extends Model
@@ -76,9 +78,19 @@ class DrillRecord extends Model
         return $this->belongsTo(DrillType::class);
     }
 
+    public function drillTypes(): BelongsToMany
+    {
+        return $this->belongsToMany(DrillType::class)->orderBy('name');
+    }
+
     public function eventType(): BelongsTo
     {
         return $this->belongsTo(EventType::class);
+    }
+
+    public function eventTypes(): BelongsToMany
+    {
+        return $this->belongsToMany(EventType::class)->orderBy('name');
     }
 
     public function status(): BelongsTo
@@ -135,5 +147,39 @@ class DrillRecord extends Model
         return $user->role === UserRole::STO->value
             && $user->rig_id === $this->rig_id
             && in_array($this->status?->code, ['draft', 'returned_by_be', 'returned_by_oim'], true);
+    }
+
+    public function drillTypeNames(): string
+    {
+        $types = $this->relationLoaded('drillTypes')
+            ? $this->drillTypes
+            : $this->drillTypes()->get();
+
+        if ($types->isNotEmpty()) {
+            return $this->joinNames($types);
+        }
+
+        return $this->drillType?->name ?? 'Not set';
+    }
+
+    public function eventTypeNames(): string
+    {
+        $types = $this->relationLoaded('eventTypes')
+            ? $this->eventTypes
+            : $this->eventTypes()->get();
+
+        if ($types->isNotEmpty()) {
+            return $this->joinNames($types);
+        }
+
+        return $this->eventType?->name ?? 'Not set';
+    }
+
+    private function joinNames(Collection $items): string
+    {
+        return $items
+            ->pluck('name')
+            ->filter()
+            ->implode(', ');
     }
 }

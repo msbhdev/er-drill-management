@@ -26,8 +26,8 @@ class EditorPage extends Component
     public ?DrillRecord $drillRecord = null;
 
     public ?int $rigId = null;
-    public ?int $drillTypeId = null;
-    public ?int $eventTypeId = null;
+    public array $drillTypeIds = [];
+    public array $eventTypeIds = [];
     public ?int $statusId = null;
     public ?string $drillDate = null;
     public ?string $drillTime = null;
@@ -53,7 +53,7 @@ class EditorPage extends Component
         $user = auth()->user();
 
         if ($drillRecord?->exists) {
-            $drillRecord->load(['events', 'actions.status', 'attachments', 'status', 'workflowHistory.actor', 'workflowHistory.fromStatus', 'workflowHistory.toStatus']);
+            $drillRecord->load(['events', 'actions.status', 'attachments', 'status', 'drillTypes', 'eventTypes', 'workflowHistory.actor', 'workflowHistory.fromStatus', 'workflowHistory.toStatus']);
             $this->authorize('view', $drillRecord);
             $this->drillRecord = $drillRecord;
             $this->fillFromModel($drillRecord);
@@ -130,8 +130,8 @@ class EditorPage extends Component
     {
         abort_unless($this->drillRecord ? $this->drillRecord->isEditableBy(auth()->user()) : Gate::allows('create', DrillRecord::class), 403);
 
-        $this->drillTypeId = null;
-        $this->eventTypeId = null;
+        $this->drillTypeIds = [];
+        $this->eventTypeIds = [];
         $this->drillDate = null;
         $this->drillTime = null;
         $this->onDutyCrews = null;
@@ -237,6 +237,8 @@ class EditorPage extends Component
                 'rig',
                 'drillType',
                 'eventType',
+                'drillTypes',
+                'eventTypes',
                 'status',
                 'attachments',
                 'workflowHistory.actor',
@@ -260,8 +262,10 @@ class EditorPage extends Component
     {
         return [
             'rigId' => ['required', 'exists:rigs,id'],
-            'drillTypeId' => ['required', 'exists:drill_types,id'],
-            'eventTypeId' => ['required', 'exists:event_types,id'],
+            'drillTypeIds' => ['required', 'array', 'min:1'],
+            'drillTypeIds.*' => ['integer', 'exists:drill_types,id'],
+            'eventTypeIds' => ['required', 'array', 'min:1'],
+            'eventTypeIds.*' => ['integer', 'exists:event_types,id'],
             'drillDate' => ['required', 'date'],
             'drillTime' => ['nullable', 'date_format:H:i'],
             'onDutyCrews' => ['nullable', 'string'],
@@ -296,10 +300,14 @@ class EditorPage extends Component
         $this->authorize($record->exists ? 'update' : 'create', $record->exists ? $record : DrillRecord::class);
 
         $validated = $this->validate();
+        $drillTypeIds = $this->normalizeIds($validated['drillTypeIds']);
+        $eventTypeIds = $this->normalizeIds($validated['eventTypeIds']);
         $payload = [
             'rig_id' => $validated['rigId'],
-            'drill_type_id' => $validated['drillTypeId'],
-            'event_type_id' => $validated['eventTypeId'],
+            'drill_type_id' => $drillTypeIds[0],
+            'event_type_id' => $eventTypeIds[0],
+            'drill_type_ids' => $drillTypeIds,
+            'event_type_ids' => $eventTypeIds,
             'drill_date' => $validated['drillDate'],
             'drill_time' => $validated['drillTime'],
             'on_duty_crews' => $validated['onDutyCrews'],
@@ -317,7 +325,7 @@ class EditorPage extends Component
 
         $record = $workflowService->saveDraft($record, $payload, auth()->user());
         $this->syncChildRecords($record);
-        $this->drillRecord = $record->fresh(['events', 'actions.status', 'attachments', 'status', 'workflowHistory.actor', 'workflowHistory.fromStatus', 'workflowHistory.toStatus']);
+        $this->drillRecord = $record->fresh(['events', 'actions.status', 'attachments', 'status', 'drillTypes', 'eventTypes', 'workflowHistory.actor', 'workflowHistory.fromStatus', 'workflowHistory.toStatus']);
 
         return $this->drillRecord;
     }
@@ -379,8 +387,8 @@ class EditorPage extends Component
     private function fillFromModel(DrillRecord $record): void
     {
         $this->rigId = $record->rig_id;
-        $this->drillTypeId = $record->drill_type_id;
-        $this->eventTypeId = $record->event_type_id;
+        $this->drillTypeIds = $record->drillTypes->pluck('id')->all();
+        $this->eventTypeIds = $record->eventTypes->pluck('id')->all();
         $this->statusId = $record->status_id;
         $this->drillDate = optional($record->drill_date)->format('Y-m-d');
         $this->drillTime = $record->drill_time ? $record->drill_time->format('H:i') : null;
@@ -413,5 +421,23 @@ class EditorPage extends Component
         if ($this->actions === []) {
             $this->addAction();
         }
+
+        if ($this->drillTypeIds === [] && $record->drill_type_id) {
+            $this->drillTypeIds = [$record->drill_type_id];
+        }
+
+        if ($this->eventTypeIds === [] && $record->event_type_id) {
+            $this->eventTypeIds = [$record->event_type_id];
+        }
+    }
+
+    private function normalizeIds(array $ids): array
+    {
+        return collect($ids)
+            ->filter(fn ($id) => filled($id))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
     }
 }

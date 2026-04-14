@@ -119,8 +119,8 @@
                             <td class="py-4 font-semibold text-stone-900">{{ $record->reference_no }}</td>
                             <td class="py-4">{{ $record->rig->name }}</td>
                             <td class="py-4">
-                                <div class="font-semibold">{{ $record->drillType->name }}</div>
-                                <div class="text-xs text-stone-500">{{ $record->eventType->name }}</div>
+                                <div class="font-semibold">{{ $record->drillTypeNames() }}</div>
+                                <div class="text-xs text-stone-500">{{ $record->eventTypeNames() }}</div>
                             </td>
                             <td class="py-4">{{ $record->drill_date?->format('d M Y') }}</td>
                             <td class="py-4">

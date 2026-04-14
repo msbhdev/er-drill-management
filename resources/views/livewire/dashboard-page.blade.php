@@ -82,7 +82,7 @@
                                 <a href="{{ route('drills.show', $drill) }}" wire:navigate class="hover:text-teal-700">{{ $drill->reference_no }}</a>
                             </td>
                             <td class="py-4">{{ $drill->rig->name }}</td>
-                            <td class="py-4">{{ $drill->drillType->name }}</td>
+                            <td class="py-4">{{ $drill->drillTypeNames() }}</td>
                             <td class="py-4">{{ $drill->drill_date?->format('d M Y') }}</td>
                             <td class="py-4">
                                 <span class="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700">{{ $drill->status->name }}</span>

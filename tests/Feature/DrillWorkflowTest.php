@@ -38,6 +38,8 @@ class DrillWorkflowTest extends TestCase
             'rig_id' => $rig->id,
             'drill_type_id' => $drillType->id,
             'event_type_id' => $eventType->id,
+            'drill_type_ids' => [$drillType->id],
+            'event_type_ids' => [$eventType->id],
             'drill_date' => now()->toDateString(),
         ], $sto);
 
@@ -71,8 +73,8 @@ class DrillWorkflowTest extends TestCase
 
         Livewire::test(EditorPage::class)
             ->set('rigId', $rig->id)
-            ->set('drillTypeId', $drillType->id)
-            ->set('eventTypeId', $eventType->id)
+            ->set('drillTypeIds', [$drillType->id])
+            ->set('eventTypeIds', [$eventType->id])
             ->call('addNewAttachment')
             ->set('newAttachments.0', UploadedFile::fake()->image('vantris-logo.png')->size(512))
             ->set('newAttachmentCaptions.0', 'Updated Vantris logo')
@@ -97,8 +99,8 @@ class DrillWorkflowTest extends TestCase
 
         Livewire::test(EditorPage::class)
             ->set('rigId', $rig->id)
-            ->set('drillTypeId', $drillType->id)
-            ->set('eventTypeId', $eventType->id)
+            ->set('drillTypeIds', [$drillType->id])
+            ->set('eventTypeIds', [$eventType->id])
             ->call('addNewAttachment')
             ->set('newAttachments.0', UploadedFile::fake()->create('checklist.pdf', 200, 'application/pdf'))
             ->set('newAttachmentCaptions.0', 'Checklist')
@@ -116,13 +118,43 @@ class DrillWorkflowTest extends TestCase
 
         Livewire::test(EditorPage::class)
             ->set('rigId', $rig->id)
-            ->set('drillTypeId', $drillType->id)
-            ->set('eventTypeId', $eventType->id)
+            ->set('drillTypeIds', [$drillType->id])
+            ->set('eventTypeIds', [$eventType->id])
             ->call('addNewAttachment')
             ->set('newAttachments.0', UploadedFile::fake()->image('oversized.png')->size(1600))
             ->set('newAttachmentCaptions.0', 'Oversized image')
             ->call('saveDraft')
             ->assertHasErrors(['newAttachments.0' => 'max']);
+    }
+
+    public function test_sto_can_assign_multiple_drill_and_event_types(): void
+    {
+        $rig = Rig::factory()->create();
+        $sto = User::factory()->create(['role' => UserRole::STO->value, 'rig_id' => $rig->id]);
+        $drillTypes = collect([
+            DrillType::query()->create(['name' => 'Fire Drill', 'is_active' => true]),
+            DrillType::query()->create(['name' => 'Abandon Rig', 'is_active' => true]),
+        ]);
+        $eventTypes = collect([
+            EventType::query()->create(['name' => 'Fire', 'is_active' => true]),
+            EventType::query()->create(['name' => 'Explosion', 'is_active' => true]),
+        ]);
+
+        $this->actingAs($sto);
+
+        Livewire::test(EditorPage::class)
+            ->set('rigId', $rig->id)
+            ->set('drillTypeIds', $drillTypes->pluck('id')->all())
+            ->set('eventTypeIds', $eventTypes->pluck('id')->all())
+            ->call('saveDraft')
+            ->assertHasNoErrors();
+
+        $record = DrillRecord::query()->with(['drillTypes', 'eventTypes'])->firstOrFail();
+
+        $this->assertSame($drillTypes->first()->id, $record->drill_type_id);
+        $this->assertSame($eventTypes->first()->id, $record->event_type_id);
+        $this->assertEqualsCanonicalizing($drillTypes->pluck('id')->all(), $record->drillTypes->pluck('id')->all());
+        $this->assertEqualsCanonicalizing($eventTypes->pluck('id')->all(), $record->eventTypes->pluck('id')->all());
     }
 
     private function drillFormContext(): array

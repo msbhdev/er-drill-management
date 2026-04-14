@@ -27,8 +27,8 @@ class DrillVerifiedNotification extends Notification implements ShouldQueue
             ->subject("Drill Verified: {$this->drillRecord->reference_no}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line("A drill for rig {$this->drillRecord->rig->name} has been verified by BE and is ready for your approval.")
-            ->line("Drill Type: {$this->drillRecord->drillType->name}")
-            ->line("Event Type: {$this->drillRecord->eventType->name}")
+            ->line("Drill Type: {$this->drillRecord->drillTypeNames()}")
+            ->line("Event Type: {$this->drillRecord->eventTypeNames()}")
             ->action('Approve Drill', route('drills.show', $this->drillRecord))
             ->line('Please approve or return it with comments.');
     }

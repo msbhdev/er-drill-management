@@ -18,8 +18,8 @@
 
         <table>
             <tr><th>Rig</th><td>{{ $record->rig->name }}</td></tr>
-            <tr><th>Drill Type</th><td>{{ $record->drillType->name }}</td></tr>
-            <tr><th>Event Type</th><td>{{ $record->eventType->name }}</td></tr>
+            <tr><th>Drill Type</th><td>{{ $record->drillTypeNames() }}</td></tr>
+            <tr><th>Event Type</th><td>{{ $record->eventTypeNames() }}</td></tr>
             <tr><th>Date</th><td>{{ $record->drill_date?->format('d M Y') }}</td></tr>
             <tr><th>Status</th><td>{{ $record->status->name }}</td></tr>
             <tr><th>STO</th><td>{{ $record->sto_name }}</td></tr>

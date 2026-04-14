@@ -27,8 +27,8 @@ class DrillSubmittedNotification extends Notification implements ShouldQueue
             ->subject("Drill Submitted: {$this->drillRecord->reference_no}")
             ->greeting("Hello {$notifiable->full_name},")
             ->line("A drill for rig {$this->drillRecord->rig->name} has been submitted and is waiting for your verification.")
-            ->line("Drill Type: {$this->drillRecord->drillType->name}")
-            ->line("Event Type: {$this->drillRecord->eventType->name}")
+            ->line("Drill Type: {$this->drillRecord->drillTypeNames()}")
+            ->line("Event Type: {$this->drillRecord->eventTypeNames()}")
             ->action('Review Drill', route('drills.show', $this->drillRecord))
             ->line('Please review and either verify or return it for correction.');
     }

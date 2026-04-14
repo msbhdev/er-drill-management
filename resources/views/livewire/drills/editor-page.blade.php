@@ -50,23 +50,29 @@
                     </div>
                     <div>
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Drill Type</label>
-                        <select wire:model="drillTypeId" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)>
-                            <option value="">Select drill type</option>
+                        <div class="mt-2 max-h-44 space-y-2 overflow-y-auto rounded-2xl border border-stone-200 bg-stone-50 p-3">
                             @foreach ($drillTypes as $drillType)
-                                <option value="{{ $drillType->id }}">{{ $drillType->name }}</option>
+                                <label class="flex items-center gap-3 rounded-2xl bg-white px-3 py-2 text-sm text-stone-700">
+                                    <input wire:model="drillTypeIds" type="checkbox" value="{{ $drillType->id }}" class="rounded border-stone-300 text-teal-700 focus:ring-teal-700" @disabled(! $editable)>
+                                    <span>{{ $drillType->name }}</span>
+                                </label>
                             @endforeach
-                        </select>
-                        @error('drillTypeId') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                        </div>
+                        @error('drillTypeIds') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                        @error('drillTypeIds.*') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Event Type</label>
-                        <select wire:model="eventTypeId" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)>
-                            <option value="">Select event type</option>
+                        <div class="mt-2 max-h-44 space-y-2 overflow-y-auto rounded-2xl border border-stone-200 bg-stone-50 p-3">
                             @foreach ($eventTypes as $eventType)
-                                <option value="{{ $eventType->id }}">{{ $eventType->name }}</option>
+                                <label class="flex items-center gap-3 rounded-2xl bg-white px-3 py-2 text-sm text-stone-700">
+                                    <input wire:model="eventTypeIds" type="checkbox" value="{{ $eventType->id }}" class="rounded border-stone-300 text-teal-700 focus:ring-teal-700" @disabled(! $editable)>
+                                    <span>{{ $eventType->name }}</span>
+                                </label>
                             @endforeach
-                        </select>
-                        @error('eventTypeId') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                        </div>
+                        @error('eventTypeIds') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                        @error('eventTypeIds.*') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                     <div class="md:col-span-2">
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">On Duty Crews</label>
@@ -206,7 +212,7 @@
                                 @if ($attachment->caption)
                                     <div class="mt-1 text-sm text-stone-600">{{ $attachment->caption }}</div>
                                 @endif
-                                <div class="text-xs uppercase tracking-[0.18em] text-stone-500">{{ $attachment->mime_type }} · {{ $attachment->file_size_kb }} KB</div>
+                                <div class="text-xs uppercase tracking-[0.18em] text-stone-500">{{ $attachment->mime_type }} Â· {{ $attachment->file_size_kb }} KB</div>
                             </div>
                             <div class="flex gap-2">
                                 <a href="{{ route('attachments.show', $attachment) }}" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Download</a>
@@ -302,7 +308,7 @@
                                     <div>
                                         <div class="text-sm font-semibold text-stone-900">{{ str($history->action)->replace('_', ' ')->headline() }}</div>
                                         <div class="mt-1 text-xs uppercase tracking-[0.18em] text-stone-500">
-                                            {{ $history->actor?->full_name ?? 'System' }} � {{ $record->rig->formatDateTime($history->created_at) }}
+                                            {{ $history->actor?->full_name ?? 'System' }} · {{ $record->rig->formatDateTime($history->created_at) }}
                                         </div>
                                     </div>
                                     @if ($history->toStatus)

@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Notifications\DrillApprovedNotification;
 use App\Notifications\DrillSubmittedNotification;
 use App\Notifications\DrillVerifiedNotification;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -21,7 +22,7 @@ class DrillWorkflowService
         return DB::transaction(function () use ($drillRecord, $payload, $actor) {
             $status = DrillStatus::query()->where('code', 'draft')->firstOrFail();
 
-            $drillRecord->fill($payload);
+            $drillRecord->fill(Arr::except($payload, ['drill_type_ids', 'event_type_ids']));
             $drillRecord->status()->associate($status);
             $drillRecord->reference_no ??= $this->generateReference($payload['rig_id'] ?? $actor->rig_id);
             $drillRecord->created_by_user_id ??= $actor->id;
@@ -29,10 +30,11 @@ class DrillWorkflowService
             $this->assignRigRoleAccounts($drillRecord, $actor);
 
             $drillRecord->save();
+            $this->syncTypes($drillRecord, $payload);
 
             $this->recordHistory($drillRecord, DrillWorkflowAction::SaveDraft, $actor, null, $status, 'Draft saved.');
 
-            return $drillRecord->fresh(['status', 'rig', 'drillType', 'eventType']);
+            return $drillRecord->fresh(['status', 'rig', 'drillType', 'eventType', 'drillTypes', 'eventTypes']);
         });
     }
 
@@ -99,10 +101,19 @@ class DrillWorkflowService
             $drillRecord->save();
 
             $this->recordHistory($drillRecord, $action, $actor, $fromStatus, $toStatus, $historyComment ?: $comments);
-            $this->sendNotifications($drillRecord->fresh(['rig', 'drillType', 'eventType', 'stoUser', 'beUser', 'oimUser']), $targetCode);
+            $this->sendNotifications($drillRecord->fresh(['rig', 'drillType', 'eventType', 'drillTypes', 'eventTypes', 'stoUser', 'beUser', 'oimUser']), $targetCode);
 
-            return $drillRecord->fresh(['status', 'rig', 'drillType', 'eventType', 'workflowHistory']);
+            return $drillRecord->fresh(['status', 'rig', 'drillType', 'eventType', 'drillTypes', 'eventTypes', 'workflowHistory']);
         });
+    }
+
+    private function syncTypes(DrillRecord $drillRecord, array $payload): void
+    {
+        $drillTypeIds = array_values(array_filter($payload['drill_type_ids'] ?? [$drillRecord->drill_type_id]));
+        $eventTypeIds = array_values(array_filter($payload['event_type_ids'] ?? [$drillRecord->event_type_id]));
+
+        $drillRecord->drillTypes()->sync($drillTypeIds);
+        $drillRecord->eventTypes()->sync($eventTypeIds);
     }
 
     private function recordHistory(

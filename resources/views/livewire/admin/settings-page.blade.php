@@ -61,9 +61,9 @@
 
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
             <h2 class="text-xl font-bold text-stone-950">User Accounts</h2>
-            <div class="mt-5 overflow-x-auto">
+            <div class="mt-5 max-h-[22.5rem] overflow-auto rounded-3xl border border-stone-200">
                 <table class="min-w-full divide-y divide-stone-200 text-sm">
-                    <thead>
+                    <thead class="sticky top-0 bg-white/95 backdrop-blur">
                         <tr class="text-left text-stone-500">
                             <th class="pb-3 font-semibold">User</th>
                             <th class="pb-3 font-semibold">Role</th>
@@ -116,7 +116,7 @@
             <div class="mt-4 flex gap-3">
                 <button wire:click="saveRig" type="button" class="rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white">{{ $editingRigId ? 'Update Rig' : 'Add Rig' }}</button>
                 @if ($editingRigId)
-                    <button wire:click="$refresh" type="button" class="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700">Refresh</button>
+                    <button wire:click="cancelRigEdit" type="button" class="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700">Cancel</button>
                 @endif
             </div>
             <div class="mt-5 space-y-3">
@@ -139,44 +139,66 @@
         </section>
 
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
-            <h2 class="text-xl font-bold text-stone-950">Drill Types</h2>
+            <h2 class="text-xl font-bold text-stone-950">{{ $editingDrillTypeId ? 'Edit Drill Type' : 'Drill Types' }}</h2>
             <div class="mt-5 grid gap-4">
                 <input wire:model="drillTypeName" type="text" placeholder="Drill type name" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
+                @error('drillTypeName') <div class="text-sm text-rose-600">{{ $message }}</div> @enderror
                 <textarea wire:model="drillTypeDescription" rows="2" placeholder="Description" class="rounded-2xl border-stone-300 bg-stone-50 text-sm"></textarea>
+                @error('drillTypeDescription') <div class="text-sm text-rose-600">{{ $message }}</div> @enderror
             </div>
-            <button wire:click="saveDrillType" type="button" class="mt-4 rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white">Add Drill Type</button>
-            <div class="mt-5 space-y-3">
+            <div class="mt-4 flex gap-3">
+                <button wire:click="saveDrillType" type="button" class="rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white">{{ $editingDrillTypeId ? 'Update Drill Type' : 'Add Drill Type' }}</button>
+                @if ($editingDrillTypeId)
+                    <button wire:click="cancelDrillTypeEdit" type="button" class="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700">Cancel</button>
+                @endif
+            </div>
+            <div class="mt-5 max-h-[22.5rem] space-y-3 overflow-y-auto pr-1">
                 @foreach ($drillTypes as $drillType)
                     <div class="flex items-center justify-between rounded-3xl border border-stone-200 bg-stone-50 p-4">
                         <div>
                             <div class="font-semibold text-stone-900">{{ $drillType->name }}</div>
                             <div class="text-sm text-stone-500">{{ $drillType->description ?: 'No description' }}</div>
                         </div>
-                        <button wire:click="toggleDrillType({{ $drillType->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">
-                            {{ $drillType->is_active ? 'Disable' : 'Enable' }}
-                        </button>
+                        <div class="flex flex-wrap justify-end gap-2">
+                            <button wire:click="editDrillType({{ $drillType->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Edit</button>
+                            <button wire:click="toggleDrillType({{ $drillType->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">
+                                {{ $drillType->is_active ? 'Disable' : 'Enable' }}
+                            </button>
+                            <button wire:click="deleteDrillType({{ $drillType->id }})" type="button" class="rounded-full border border-rose-200 px-4 py-2 text-xs font-semibold text-rose-700">Delete</button>
+                        </div>
                     </div>
                 @endforeach
             </div>
         </section>
 
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
-            <h2 class="text-xl font-bold text-stone-950">Event Types</h2>
+            <h2 class="text-xl font-bold text-stone-950">{{ $editingEventTypeId ? 'Edit Event Type' : 'Event Types' }}</h2>
             <div class="mt-5 grid gap-4">
                 <input wire:model="eventTypeName" type="text" placeholder="Event type name" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
+                @error('eventTypeName') <div class="text-sm text-rose-600">{{ $message }}</div> @enderror
                 <textarea wire:model="eventTypeDescription" rows="2" placeholder="Description" class="rounded-2xl border-stone-300 bg-stone-50 text-sm"></textarea>
+                @error('eventTypeDescription') <div class="text-sm text-rose-600">{{ $message }}</div> @enderror
             </div>
-            <button wire:click="saveEventType" type="button" class="mt-4 rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white">Add Event Type</button>
-            <div class="mt-5 space-y-3">
+            <div class="mt-4 flex gap-3">
+                <button wire:click="saveEventType" type="button" class="rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white">{{ $editingEventTypeId ? 'Update Event Type' : 'Add Event Type' }}</button>
+                @if ($editingEventTypeId)
+                    <button wire:click="cancelEventTypeEdit" type="button" class="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700">Cancel</button>
+                @endif
+            </div>
+            <div class="mt-5 max-h-[22.5rem] space-y-3 overflow-y-auto pr-1">
                 @foreach ($eventTypes as $eventType)
                     <div class="flex items-center justify-between rounded-3xl border border-stone-200 bg-stone-50 p-4">
                         <div>
                             <div class="font-semibold text-stone-900">{{ $eventType->name }}</div>
                             <div class="text-sm text-stone-500">{{ $eventType->description ?: 'No description' }}</div>
                         </div>
-                        <button wire:click="toggleEventType({{ $eventType->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">
-                            {{ $eventType->is_active ? 'Disable' : 'Enable' }}
-                        </button>
+                        <div class="flex flex-wrap justify-end gap-2">
+                            <button wire:click="editEventType({{ $eventType->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Edit</button>
+                            <button wire:click="toggleEventType({{ $eventType->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">
+                                {{ $eventType->is_active ? 'Disable' : 'Enable' }}
+                            </button>
+                            <button wire:click="deleteEventType({{ $eventType->id }})" type="button" class="rounded-full border border-rose-200 px-4 py-2 text-xs font-semibold text-rose-700">Delete</button>
+                        </div>
                     </div>
                 @endforeach
             </div>

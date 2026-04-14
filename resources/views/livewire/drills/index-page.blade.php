@@ -85,8 +85,8 @@
                             <td class="py-4 font-semibold text-stone-900">{{ $drill->reference_no }}</td>
                             <td class="py-4">{{ $drill->rig->name }}</td>
                             <td class="py-4">
-                                <div class="font-semibold">{{ $drill->drillType->name }}</div>
-                                <div class="text-xs text-stone-500">{{ $drill->eventType->name }}</div>
+                                <div class="font-semibold">{{ $drill->drillTypeNames() }}</div>
+                                <div class="text-xs text-stone-500">{{ $drill->eventTypeNames() }}</div>
                             </td>
                             <td class="py-4">{{ $drill->drill_date?->format('d M Y') }}</td>
                             <td class="py-4">

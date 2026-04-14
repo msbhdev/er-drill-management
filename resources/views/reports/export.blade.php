@@ -35,8 +35,8 @@
                         <td>{{ $record->reference_no }}</td>
                         <td>{{ $record->rig->name }}</td>
                         <td>{{ $record->drill_date?->format('d M Y') }}</td>
-                        <td>{{ $record->drillType->name }}</td>
-                        <td>{{ $record->eventType->name }}</td>
+                        <td>{{ $record->drillTypeNames() }}</td>
+                        <td>{{ $record->eventTypeNames() }}</td>
                         <td>{{ $record->status->name }}</td>
                         <td>{{ $record->performance_standards_met ?: 'N/A' }}</td>
                     </tr>

@@ -30,8 +30,10 @@ class SettingsPage extends Component
     public string $rigLocation = '';
     public string $rigTimezone = 'Asia/Kuala_Lumpur';
 
+    public ?int $editingDrillTypeId = null;
     public string $drillTypeName = '';
     public string $drillTypeDescription = '';
+    public ?int $editingEventTypeId = null;
     public string $eventTypeName = '';
     public string $eventTypeDescription = '';
 
@@ -150,36 +152,123 @@ class SettingsPage extends Component
         $this->rigTimezone = $rig->timezoneName();
     }
 
+    public function cancelRigEdit(): void
+    {
+        $this->resetRigForm();
+    }
+
     public function saveDrillType(): void
     {
         $validated = $this->validate([
-            'drillTypeName' => ['required', 'string', 'max:255', 'unique:drill_types,name'],
+            'drillTypeName' => ['required', 'string', 'max:255', Rule::unique('drill_types', 'name')->ignore($this->editingDrillTypeId)],
             'drillTypeDescription' => ['nullable', 'string'],
         ]);
 
-        DrillType::query()->create([
-            'name' => $validated['drillTypeName'],
-            'description' => $validated['drillTypeDescription'],
-            'is_active' => true,
-        ]);
+        if ($this->editingDrillTypeId) {
+            DrillType::query()->findOrFail($this->editingDrillTypeId)->update([
+                'name' => $validated['drillTypeName'],
+                'description' => $validated['drillTypeDescription'],
+            ]);
+        } else {
+            DrillType::query()->create([
+                'name' => $validated['drillTypeName'],
+                'description' => $validated['drillTypeDescription'],
+                'is_active' => true,
+            ]);
+        }
 
-        $this->reset('drillTypeName', 'drillTypeDescription');
+        $this->resetDrillTypeForm();
+        session()->flash('status', 'Drill type saved successfully.');
+    }
+
+    public function editDrillType(int $drillTypeId): void
+    {
+        $drillType = DrillType::query()->findOrFail($drillTypeId);
+
+        $this->editingDrillTypeId = $drillType->id;
+        $this->drillTypeName = $drillType->name;
+        $this->drillTypeDescription = $drillType->description ?? '';
+    }
+
+    public function cancelDrillTypeEdit(): void
+    {
+        $this->resetDrillTypeForm();
+    }
+
+    public function deleteDrillType(int $drillTypeId): void
+    {
+        $drillType = DrillType::query()->findOrFail($drillTypeId);
+
+        if ($drillType->primaryDrillRecords()->exists() || $drillType->drillRecords()->exists()) {
+            session()->flash('status', 'This drill type is already used by drill records and cannot be deleted.');
+
+            return;
+        }
+
+        $drillType->delete();
+
+        if ($this->editingDrillTypeId === $drillTypeId) {
+            $this->resetDrillTypeForm();
+        }
+
+        session()->flash('status', 'Drill type deleted successfully.');
     }
 
     public function saveEventType(): void
     {
         $validated = $this->validate([
-            'eventTypeName' => ['required', 'string', 'max:255', 'unique:event_types,name'],
+            'eventTypeName' => ['required', 'string', 'max:255', Rule::unique('event_types', 'name')->ignore($this->editingEventTypeId)],
             'eventTypeDescription' => ['nullable', 'string'],
         ]);
 
-        EventType::query()->create([
-            'name' => $validated['eventTypeName'],
-            'description' => $validated['eventTypeDescription'],
-            'is_active' => true,
-        ]);
+        if ($this->editingEventTypeId) {
+            EventType::query()->findOrFail($this->editingEventTypeId)->update([
+                'name' => $validated['eventTypeName'],
+                'description' => $validated['eventTypeDescription'],
+            ]);
+        } else {
+            EventType::query()->create([
+                'name' => $validated['eventTypeName'],
+                'description' => $validated['eventTypeDescription'],
+                'is_active' => true,
+            ]);
+        }
 
-        $this->reset('eventTypeName', 'eventTypeDescription');
+        $this->resetEventTypeForm();
+        session()->flash('status', 'Event type saved successfully.');
+    }
+
+    public function editEventType(int $eventTypeId): void
+    {
+        $eventType = EventType::query()->findOrFail($eventTypeId);
+
+        $this->editingEventTypeId = $eventType->id;
+        $this->eventTypeName = $eventType->name;
+        $this->eventTypeDescription = $eventType->description ?? '';
+    }
+
+    public function cancelEventTypeEdit(): void
+    {
+        $this->resetEventTypeForm();
+    }
+
+    public function deleteEventType(int $eventTypeId): void
+    {
+        $eventType = EventType::query()->findOrFail($eventTypeId);
+
+        if ($eventType->primaryDrillRecords()->exists() || $eventType->drillRecords()->exists()) {
+            session()->flash('status', 'This event type is already used by drill records and cannot be deleted.');
+
+            return;
+        }
+
+        $eventType->delete();
+
+        if ($this->editingEventTypeId === $eventTypeId) {
+            $this->resetEventTypeForm();
+        }
+
+        session()->flash('status', 'Event type deleted successfully.');
     }
 
     public function saveDrillStatus(): void
@@ -269,6 +358,16 @@ class SettingsPage extends Component
     {
         $this->reset('editingRigId', 'rigName', 'rigCode', 'rigLocation');
         $this->rigTimezone = 'Asia/Kuala_Lumpur';
+    }
+
+    private function resetDrillTypeForm(): void
+    {
+        $this->reset('editingDrillTypeId', 'drillTypeName', 'drillTypeDescription');
+    }
+
+    private function resetEventTypeForm(): void
+    {
+        $this->reset('editingEventTypeId', 'eventTypeName', 'eventTypeDescription');
     }
 
     private function writeRoleHistory(User $user): void

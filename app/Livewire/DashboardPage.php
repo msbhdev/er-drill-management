@@ -14,7 +14,7 @@ class DashboardPage extends Component
 
         $baseQuery = DrillRecord::query()->visibleTo($user);
         $recentDrills = (clone $baseQuery)
-            ->with(['rig', 'drillType', 'status'])
+            ->with(['rig', 'drillTypes', 'status'])
             ->latest('drill_date')
             ->limit(6)
             ->get();

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DrillType extends Model
@@ -23,7 +24,12 @@ class DrillType extends Model
         ];
     }
 
-    public function drillRecords(): HasMany
+    public function drillRecords(): BelongsToMany
+    {
+        return $this->belongsToMany(DrillRecord::class);
+    }
+
+    public function primaryDrillRecords(): HasMany
     {
         return $this->hasMany(DrillRecord::class);
     }
