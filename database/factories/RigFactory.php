@@ -20,6 +20,7 @@ class RigFactory extends Factory
             'name' => 'Rig '.$code,
             'code' => $code,
             'location' => fake()->city(),
+            'timezone' => 'Asia/Kuala_Lumpur',
             'is_active' => true,
         ];
     }

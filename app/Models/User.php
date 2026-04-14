@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
+use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -89,5 +90,32 @@ class User extends Authenticatable
         }
 
         return $rigId !== null && $this->rig_id === $rigId;
+    }
+
+    public function needsNameConfirmation(int $days = 14): bool
+    {
+        if (blank($this->full_name) || ! $this->name_confirmed_at) {
+            return true;
+        }
+
+        return $this->name_confirmed_at->lte(now()->subDays($days));
+    }
+
+    public function confirmFullName(string $fullName): void
+    {
+        $this->forceFill([
+            'full_name' => trim($fullName),
+            'name_confirmed_at' => now(),
+        ])->save();
+    }
+
+    public function preferredTimezone(): string
+    {
+        return $this->rig?->timezoneName() ?? config('er_drill.default_timezone', 'Asia/Kuala_Lumpur');
+    }
+
+    public function formatDateTime(?CarbonInterface $value, string $format = 'd M Y H:i'): ?string
+    {
+        return $value?->copy()->timezone($this->preferredTimezone())->format($format);
     }
 }

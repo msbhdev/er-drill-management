@@ -85,7 +85,7 @@
             <tbody>
                 @foreach ($record->workflowHistory as $history)
                     <tr>
-                        <td>{{ $history->created_at->format('d M Y H:i') }}</td>
+                        <td>{{ $record->rig->formatDateTime($history->created_at) }}</td>
                         <td>{{ $history->actor?->full_name ?? 'System' }}</td>
                         <td>{{ str($history->action)->replace('_', ' ')->headline() }}</td>
                         <td>{{ $history->comments }}</td>

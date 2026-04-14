@@ -37,6 +37,27 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticated();
     }
 
+    public function test_login_does_not_refresh_name_confirmation_timestamp(): void
+    {
+        $confirmedAt = now()->subDays(20)->startOfSecond();
+
+        $user = User::factory()->create([
+            'name_confirmed_at' => $confirmedAt,
+        ]);
+
+        $component = Volt::test('pages.auth.login')
+            ->set('form.email', $user->email)
+            ->set('form.password', 'password');
+
+        $component->call('login');
+
+        $component
+            ->assertHasNoErrors()
+            ->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertTrue($user->fresh()->name_confirmed_at->eq($confirmedAt));
+    }
+
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         $user = User::factory()->create();

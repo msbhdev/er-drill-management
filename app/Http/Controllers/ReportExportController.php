@@ -61,7 +61,7 @@ class ReportExportController extends Controller
         return Pdf::loadView('reports.export', [
             'records' => $records,
             'overdueActions' => $overdueActions,
-            'generatedAt' => now(),
+            'generatedAt' => $request->user()->formatDateTime(now()),
         ])->download('er-drill-report.pdf');
     }
 

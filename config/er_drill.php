@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'default_timezone' => env('ER_DRILL_DEFAULT_TIMEZONE', 'Asia/Kuala_Lumpur'),
+    'timezones' => [
+        'Asia/Kuala_Lumpur' => 'Kuala Lumpur (UTC+8)',
+        'Asia/Bangkok' => 'Bangkok (UTC+7)',
+        'UTC' => 'UTC',
+    ],
     'roles' => [
         'STO' => 'STO',
         'BE' => 'BE',

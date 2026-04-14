@@ -16,6 +16,7 @@ use Livewire\Component;
 class SettingsPage extends Component
 {
     public ?int $editingUserId = null;
+    public ?int $editingRigId = null;
     public string $userFullName = '';
     public string $userEmail = '';
     public string $userRole = 'STO';
@@ -27,6 +28,7 @@ class SettingsPage extends Component
     public string $rigName = '';
     public string $rigCode = '';
     public string $rigLocation = '';
+    public string $rigTimezone = 'Asia/Kuala_Lumpur';
 
     public string $drillTypeName = '';
     public string $drillTypeDescription = '';
@@ -111,19 +113,41 @@ class SettingsPage extends Component
     public function saveRig(): void
     {
         $validated = $this->validate([
-            'rigName' => ['required', 'string', 'max:255', 'unique:rigs,name'],
-            'rigCode' => ['required', 'string', 'max:50', 'unique:rigs,code'],
+            'rigName' => ['required', 'string', 'max:255', Rule::unique('rigs', 'name')->ignore($this->editingRigId)],
+            'rigCode' => ['required', 'string', 'max:50', Rule::unique('rigs', 'code')->ignore($this->editingRigId)],
             'rigLocation' => ['nullable', 'string', 'max:255'],
+            'rigTimezone' => ['required', Rule::in(array_keys(config('er_drill.timezones')))],
         ]);
 
-        Rig::query()->create([
+        $rig = Rig::query()->find($this->editingRigId);
+        $payload = [
             'name' => $validated['rigName'],
             'code' => strtoupper($validated['rigCode']),
             'location' => $validated['rigLocation'],
-            'is_active' => true,
-        ]);
+            'timezone' => $validated['rigTimezone'],
+        ];
 
-        $this->reset('rigName', 'rigCode', 'rigLocation');
+        if ($rig) {
+            $rig->update($payload);
+        } else {
+            Rig::query()->create([
+                ...$payload,
+                'is_active' => true,
+            ]);
+        }
+
+        $this->resetRigForm();
+    }
+
+    public function editRig(int $rigId): void
+    {
+        $rig = Rig::query()->findOrFail($rigId);
+
+        $this->editingRigId = $rig->id;
+        $this->rigName = $rig->name;
+        $this->rigCode = $rig->code;
+        $this->rigLocation = $rig->location ?? '';
+        $this->rigTimezone = $rig->timezoneName();
     }
 
     public function saveDrillType(): void
@@ -239,6 +263,12 @@ class SettingsPage extends Component
         $this->reset('editingUserId', 'userFullName', 'userEmail', 'userRigId', 'userDescription', 'userPassword');
         $this->userRole = 'STO';
         $this->userActiveStatus = true;
+    }
+
+    private function resetRigForm(): void
+    {
+        $this->reset('editingRigId', 'rigName', 'rigCode', 'rigLocation');
+        $this->rigTimezone = 'Asia/Kuala_Lumpur';
     }
 
     private function writeRoleHistory(User $user): void

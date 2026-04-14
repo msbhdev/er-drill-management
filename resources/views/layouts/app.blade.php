@@ -17,6 +17,7 @@
     <body class="font-sans antialiased bg-stone-950 text-stone-900" style="font-family: Manrope, sans-serif;">
         <div class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.18),_transparent_25%),linear-gradient(180deg,_#faf7f2_0%,_#f5efe4_45%,_#efe4d2_100%)]">
             <livewire:layout.navigation />
+            <livewire:profile.name-confirmation-modal />
 
             <!-- Page Heading -->
             @if (isset($header))

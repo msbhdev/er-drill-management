@@ -22,8 +22,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $rigs = collect([
-            ['name' => 'Rig Alpha', 'code' => 'RAL', 'location' => 'Sarawak'],
-            ['name' => 'Rig Bravo', 'code' => 'RBR', 'location' => 'Sabah'],
+            ['name' => 'Rig Alpha', 'code' => 'RAL', 'location' => 'Sarawak', 'timezone' => 'Asia/Kuala_Lumpur'],
+            ['name' => 'Rig Bravo', 'code' => 'RBR', 'location' => 'Sabah', 'timezone' => 'Asia/Kuala_Lumpur'],
         ])->map(fn (array $rig) => Rig::query()->firstOrCreate(['code' => $rig['code']], $rig));
 
         foreach ([

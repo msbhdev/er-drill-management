@@ -64,7 +64,6 @@ class LoginForm extends Form
             'failed_login_attempts' => 0,
             'locked_until' => null,
             'last_login_at' => now(),
-            'name_confirmed_at' => now(),
         ])->save();
 
         RateLimiter::clear($this->throttleKey());

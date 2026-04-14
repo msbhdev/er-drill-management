@@ -1,10 +1,17 @@
 <?php
 
 use App\Livewire\Actions\Logout;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new class extends Component
 {
+    #[On('profile-updated')]
+    public function refreshUserDetails(): void
+    {
+        // Re-render the navigation after a profile name update.
+    }
+
     /**
      * Log the current user out of the application.
      */

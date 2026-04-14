@@ -14,7 +14,7 @@
     </head>
     <body>
         <h1>ER Drill Report</h1>
-        <div class="meta">Generated at {{ $generatedAt->format('d M Y H:i') }}</div>
+        <div class="meta">Generated at {{ $generatedAt }}</div>
 
         <h2>Drill Records</h2>
         <table>

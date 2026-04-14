@@ -302,7 +302,7 @@
                                     <div>
                                         <div class="text-sm font-semibold text-stone-900">{{ str($history->action)->replace('_', ' ')->headline() }}</div>
                                         <div class="mt-1 text-xs uppercase tracking-[0.18em] text-stone-500">
-                                            {{ $history->actor?->full_name ?? 'System' }} Â· {{ $history->created_at->format('d M Y H:i') }}
+                                            {{ $history->actor?->full_name ?? 'System' }} · {{ $record->rig->formatDateTime($history->created_at) }}
                                         </div>
                                     </div>
                                     @if ($history->toStatus)
@@ -324,3 +324,6 @@
         </div>
     </div>
 </div>
+
+
+

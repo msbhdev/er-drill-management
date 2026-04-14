@@ -102,23 +102,37 @@
 
     <div class="grid gap-6 xl:grid-cols-2">
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
-            <h2 class="text-xl font-bold text-stone-950">Rigs</h2>
-            <div class="mt-5 grid gap-4 md:grid-cols-3">
+            <h2 class="text-xl font-bold text-stone-950">{{ $editingRigId ? 'Edit Rig' : 'Rigs' }}</h2>
+            <div class="mt-5 grid gap-4 md:grid-cols-4">
                 <input wire:model="rigName" type="text" placeholder="Rig name" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
                 <input wire:model="rigCode" type="text" placeholder="Code" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
                 <input wire:model="rigLocation" type="text" placeholder="Location" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
+                <select wire:model="rigTimezone" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
+                    @foreach (config('er_drill.timezones') as $timezone => $label)
+                        <option value="{{ $timezone }}">{{ $label }}</option>
+                    @endforeach
+                </select>
             </div>
-            <button wire:click="saveRig" type="button" class="mt-4 rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white">Add Rig</button>
+            <div class="mt-4 flex gap-3">
+                <button wire:click="saveRig" type="button" class="rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white">{{ $editingRigId ? 'Update Rig' : 'Add Rig' }}</button>
+                @if ($editingRigId)
+                    <button wire:click="$refresh" type="button" class="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700">Refresh</button>
+                @endif
+            </div>
             <div class="mt-5 space-y-3">
                 @foreach ($rigs as $rig)
                     <div class="flex items-center justify-between rounded-3xl border border-stone-200 bg-stone-50 p-4">
                         <div>
                             <div class="font-semibold text-stone-900">{{ $rig->name }} ({{ $rig->code }})</div>
                             <div class="text-sm text-stone-500">{{ $rig->location ?: 'No location set' }}</div>
+                            <div class="text-xs uppercase tracking-[0.16em] text-stone-400">{{ config('er_drill.timezones')[$rig->timezoneName()] ?? $rig->timezoneName() }}</div>
                         </div>
-                        <button wire:click="toggleRig({{ $rig->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">
-                            {{ $rig->is_active ? 'Disable' : 'Enable' }}
-                        </button>
+                        <div class="flex gap-2">
+                            <button wire:click="editRig({{ $rig->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Edit</button>
+                            <button wire:click="toggleRig({{ $rig->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">
+                                {{ $rig->is_active ? 'Disable' : 'Enable' }}
+                            </button>
+                        </div>
                     </div>
                 @endforeach
             </div>
