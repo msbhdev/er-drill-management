@@ -1,3 +1,5 @@
+@php($pageSizeOptions = ['5', '10', '30', '50', 'all'])
+
 <div class="space-y-6">
     <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
         <div class="text-sm font-semibold uppercase tracking-[0.24em] text-stone-500">Administration</div>
@@ -64,13 +66,17 @@
                 <h2 class="text-xl font-bold text-stone-950">User Accounts</h2>
                 <label class="flex items-center gap-3 text-sm text-stone-600">
                     <span>Show</span>
-                    <select wire:model.live="userRecordsPerPage" class="rounded-full border-stone-300 bg-white px-4 py-2 text-sm">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="30">30</option>
-                        <option value="50">50</option>
-                        <option value="all">All</option>
-                    </select>
+                    <span class="inline-flex flex-wrap gap-2">
+                        @foreach ($pageSizeOptions as $option)
+                            <button
+                                wire:click="$set('userRecordsPerPage', '{{ $option }}')"
+                                type="button"
+                                class="rounded-full px-4 py-2 text-sm font-semibold transition {{ $userRecordsPerPage === $option ? 'bg-stone-900 text-white' : 'border border-stone-300 bg-white text-stone-700' }}"
+                            >
+                                {{ $option === 'all' ? 'All' : $option }}
+                            </button>
+                        @endforeach
+                    </span>
                 </label>
             </div>
             <div class="mt-5 overflow-hidden rounded-3xl border border-stone-200 bg-white">
@@ -119,7 +125,23 @@
 
     <div class="grid gap-6 xl:grid-cols-2">
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
-            <h2 class="text-xl font-bold text-stone-950">{{ $editingRigId ? 'Edit Rig' : 'Rigs' }}</h2>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 class="text-xl font-bold text-stone-950">{{ $editingRigId ? 'Edit Rig' : 'Rigs' }}</h2>
+                <label class="flex items-center gap-3 text-sm text-stone-600">
+                    <span>Show</span>
+                    <span class="inline-flex flex-wrap gap-2">
+                        @foreach ($pageSizeOptions as $option)
+                            <button
+                                wire:click="$set('rigRecordsPerPage', '{{ $option }}')"
+                                type="button"
+                                class="rounded-full px-4 py-2 text-sm font-semibold transition {{ $rigRecordsPerPage === $option ? 'bg-stone-900 text-white' : 'border border-stone-300 bg-white text-stone-700' }}"
+                            >
+                                {{ $option === 'all' ? 'All' : $option }}
+                            </button>
+                        @endforeach
+                    </span>
+                </label>
+            </div>
             <div class="mt-5 grid gap-4 md:grid-cols-4">
                 <input wire:model="rigName" type="text" placeholder="Rig name" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
                 <input wire:model="rigCode" type="text" placeholder="Code" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
@@ -136,7 +158,7 @@
                     <button wire:click="cancelRigEdit" type="button" class="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700">Cancel</button>
                 @endif
             </div>
-            <div class="mt-5 space-y-3">
+            <div class="mt-5 max-h-[22.5rem] space-y-3 overflow-y-auto pr-1">
                 @foreach ($rigs as $rig)
                     <div class="flex items-center justify-between rounded-3xl border border-stone-200 bg-stone-50 p-4">
                         <div>
@@ -153,6 +175,9 @@
                     </div>
                 @endforeach
             </div>
+            <div class="mt-4">
+                {{ $rigs->links() }}
+            </div>
         </section>
 
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
@@ -160,13 +185,17 @@
                 <h2 class="text-xl font-bold text-stone-950">{{ $editingDrillTypeId ? 'Edit Drill Type' : 'Drill Types' }}</h2>
                 <label class="flex items-center gap-3 text-sm text-stone-600">
                     <span>Show</span>
-                    <select wire:model.live="drillTypeRecordsPerPage" class="rounded-full border-stone-300 bg-white px-4 py-2 text-sm">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="30">30</option>
-                        <option value="50">50</option>
-                        <option value="all">All</option>
-                    </select>
+                    <span class="inline-flex flex-wrap gap-2">
+                        @foreach ($pageSizeOptions as $option)
+                            <button
+                                wire:click="$set('drillTypeRecordsPerPage', '{{ $option }}')"
+                                type="button"
+                                class="rounded-full px-4 py-2 text-sm font-semibold transition {{ $drillTypeRecordsPerPage === $option ? 'bg-stone-900 text-white' : 'border border-stone-300 bg-white text-stone-700' }}"
+                            >
+                                {{ $option === 'all' ? 'All' : $option }}
+                            </button>
+                        @endforeach
+                    </span>
                 </label>
             </div>
             <div class="mt-5 grid gap-4">
@@ -208,13 +237,17 @@
                 <h2 class="text-xl font-bold text-stone-950">{{ $editingEventTypeId ? 'Edit Event Type' : 'Event Types' }}</h2>
                 <label class="flex items-center gap-3 text-sm text-stone-600">
                     <span>Show</span>
-                    <select wire:model.live="eventTypeRecordsPerPage" class="rounded-full border-stone-300 bg-white px-4 py-2 text-sm">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="30">30</option>
-                        <option value="50">50</option>
-                        <option value="all">All</option>
-                    </select>
+                    <span class="inline-flex flex-wrap gap-2">
+                        @foreach ($pageSizeOptions as $option)
+                            <button
+                                wire:click="$set('eventTypeRecordsPerPage', '{{ $option }}')"
+                                type="button"
+                                class="rounded-full px-4 py-2 text-sm font-semibold transition {{ $eventTypeRecordsPerPage === $option ? 'bg-stone-900 text-white' : 'border border-stone-300 bg-white text-stone-700' }}"
+                            >
+                                {{ $option === 'all' ? 'All' : $option }}
+                            </button>
+                        @endforeach
+                    </span>
                 </label>
             </div>
             <div class="mt-5 grid gap-4">

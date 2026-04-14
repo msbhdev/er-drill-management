@@ -118,6 +118,28 @@ class SettingsPageTest extends TestCase
             ->assertSee('User 06');
     }
 
+    public function test_rigs_list_is_paginated_to_five_records_by_default(): void
+    {
+        $admin = User::factory()->create([
+            'role' => UserRole::Administrator->value,
+            'rig_id' => null,
+        ]);
+
+        foreach (range(1, 6) as $index) {
+            Rig::factory()->create([
+                'name' => sprintf('Rig %02d', $index),
+                'code' => sprintf('R%02d', $index),
+            ]);
+        }
+
+        $this->actingAs($admin);
+
+        Livewire::test(SettingsPage::class)
+            ->assertSee('Rig 01')
+            ->assertSee('Rig 05')
+            ->assertDontSee('Rig 06');
+    }
+
     public function test_administrator_can_edit_and_delete_a_drill_type(): void
     {
         $admin = User::factory()->create([

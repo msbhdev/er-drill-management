@@ -21,6 +21,7 @@ class SettingsPage extends Component
     protected string $paginationTheme = 'tailwind';
 
     public string $userRecordsPerPage = '5';
+    public string $rigRecordsPerPage = '5';
     public string $drillTypeRecordsPerPage = '5';
     public string $eventTypeRecordsPerPage = '5';
 
@@ -149,6 +150,7 @@ class SettingsPage extends Component
         }
 
         $this->resetRigForm();
+        $this->resetPage('rigsPage');
     }
 
     public function editRig(int $rigId): void
@@ -354,6 +356,11 @@ class SettingsPage extends Component
         $this->resetPage('usersPage');
     }
 
+    public function updatedRigRecordsPerPage(): void
+    {
+        $this->resetPage('rigsPage');
+    }
+
     public function updatedDrillTypeRecordsPerPage(): void
     {
         $this->resetPage('drillTypesPage');
@@ -371,6 +378,7 @@ class SettingsPage extends Component
             ->orderBy('role')
             ->orderBy('full_name');
 
+        $rigQuery = Rig::query()->orderBy('name');
         $drillTypeQuery = DrillType::query()->orderBy('name');
         $eventTypeQuery = EventType::query()->orderBy('name');
 
@@ -379,7 +387,10 @@ class SettingsPage extends Component
                 $this->resolvePerPage($userQuery->toBase()->getCountForPagination(), $this->userRecordsPerPage),
                 pageName: 'usersPage'
             ),
-            'rigs' => Rig::query()->orderBy('name')->get(),
+            'rigs' => $rigQuery->paginate(
+                $this->resolvePerPage($rigQuery->toBase()->getCountForPagination(), $this->rigRecordsPerPage),
+                pageName: 'rigsPage'
+            ),
             'drillTypes' => $drillTypeQuery->paginate(
                 $this->resolvePerPage($drillTypeQuery->toBase()->getCountForPagination(), $this->drillTypeRecordsPerPage),
                 pageName: 'drillTypesPage'
