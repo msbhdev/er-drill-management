@@ -2,12 +2,12 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\AccountAppAccess;
 use App\Models\ActionStatus;
 use App\Models\DrillStatus;
 use App\Models\DrillType;
 use App\Models\EventType;
 use App\Models\Rig;
-use App\Models\RoleHistory;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -33,6 +33,11 @@ class SettingsPage extends Component
     public ?int $userRigId = null;
     public string $userDescription = '';
     public bool $userActiveStatus = true;
+    public bool $userHasAppAccess = true;
+    public string $userCurrentAssigneeName = '';
+    public string $userAssigneeEffectiveFrom = '';
+    public string $userAssigneeEffectiveTo = '';
+    public string $userAssigneeRemarks = '';
     public string $userPassword = '';
 
     public string $rigName = '';
@@ -52,26 +57,38 @@ class SettingsPage extends Component
     public string $actionStatusName = '';
     public string $actionStatusCode = '';
 
+    public function mount(): void
+    {
+        $this->userAssigneeEffectiveFrom = now()->toDateString();
+    }
+
     public function saveUser(): void
     {
+        $requiresRigAssignment = ! in_array($this->userRole, ['Management', 'Administrator'], true);
+
         $rules = [
             'userFullName' => ['required', 'string', 'max:255'],
-            'userEmail' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->editingUserId)],
+            'userEmail' => ['required', 'email', 'max:255', Rule::unique('auth.accounts', 'email')->ignore($this->editingUserId)],
             'userRole' => ['required', Rule::in(array_values(config('er_drill.roles')))],
-            'userRigId' => ['nullable', 'exists:rigs,id'],
+            'userRigId' => [$requiresRigAssignment ? 'required' : 'nullable', 'exists:rigs,id'],
             'userDescription' => ['nullable', 'string'],
+            'userCurrentAssigneeName' => [$requiresRigAssignment ? 'required' : 'nullable', 'string', 'max:255'],
+            'userAssigneeEffectiveFrom' => [$requiresRigAssignment ? 'required' : 'nullable', 'date'],
+            'userAssigneeEffectiveTo' => ['nullable', 'date', 'after_or_equal:userAssigneeEffectiveFrom'],
+            'userAssigneeRemarks' => ['nullable', 'string'],
             'userPassword' => [$this->editingUserId ? 'nullable' : 'required', 'string', 'min:8'],
         ];
 
         $validated = $this->validate($rules);
 
         $user = User::query()->find($this->editingUserId);
-        $previous = $user?->only(['full_name', 'role', 'rig_id']);
+        $previous = $user?->only(['full_name', 'role_code', 'rig_code']);
 
         $payload = [
             'full_name' => $validated['userFullName'],
             'email' => strtolower($validated['userEmail']),
             'role' => $validated['userRole'],
+            'account_type' => $requiresRigAssignment ? 'shared_role' : 'admin',
             'rig_id' => in_array($validated['userRole'], ['Management', 'Administrator'], true) ? null : $validated['userRigId'],
             'description' => $validated['userDescription'],
             'active_status' => $this->userActiveStatus,
@@ -84,19 +101,19 @@ class SettingsPage extends Component
 
         if (! $user) {
             $user = User::query()->create($payload);
-            $this->writeRoleHistory($user);
         } else {
             $user->update($payload);
-
-            if (! $previous || $previous['full_name'] !== $user->full_name || $previous['role'] !== $user->role || (int) $previous['rig_id'] !== (int) $user->rig_id) {
-                RoleHistory::query()
-                    ->where('user_id', $user->id)
-                    ->whereNull('effective_to')
-                    ->update(['effective_to' => now()->toDateString()]);
-
-                $this->writeRoleHistory($user);
-            }
         }
+
+        if (! $previous || $previous['full_name'] !== $user->full_name || $previous['role_code'] !== $user->role_code || $previous['rig_code'] !== $user->rig_code) {
+            $this->syncCurrentAssignee($user);
+        }
+
+        if ($this->userCurrentAssigneeName !== '' || $this->userAssigneeEffectiveFrom !== '' || $this->userAssigneeRemarks !== '') {
+            $this->syncCurrentAssignee($user);
+        }
+
+        $this->syncAppAccess($user);
 
         $this->resetUserForm();
         $this->resetPage('usersPage');
@@ -106,6 +123,7 @@ class SettingsPage extends Component
     public function editUser(int $userId): void
     {
         $user = User::query()->findOrFail($userId);
+        $currentAssignee = $user->currentAssignee();
 
         $this->editingUserId = $user->id;
         $this->userFullName = $user->full_name;
@@ -114,6 +132,11 @@ class SettingsPage extends Component
         $this->userRigId = $user->rig_id;
         $this->userDescription = $user->description ?? '';
         $this->userActiveStatus = $user->active_status;
+        $this->userHasAppAccess = $user->hasAppAccess(config('er_drill.auth_app_code'));
+        $this->userCurrentAssigneeName = $currentAssignee?->person_name ?? '';
+        $this->userAssigneeEffectiveFrom = optional($currentAssignee?->effective_from)->format('Y-m-d') ?? now()->toDateString();
+        $this->userAssigneeEffectiveTo = optional($currentAssignee?->effective_to)->format('Y-m-d') ?? '';
+        $this->userAssigneeRemarks = $currentAssignee?->remarks ?? '';
         $this->userPassword = '';
     }
 
@@ -375,7 +398,7 @@ class SettingsPage extends Component
     {
         $userQuery = User::query()
             ->with('rig')
-            ->orderBy('role')
+            ->orderBy('role_code')
             ->orderBy('full_name');
 
         $rigQuery = Rig::query()->orderBy('name');
@@ -406,9 +429,22 @@ class SettingsPage extends Component
 
     private function resetUserForm(): void
     {
-        $this->reset('editingUserId', 'userFullName', 'userEmail', 'userRigId', 'userDescription', 'userPassword');
+        $this->reset(
+            'editingUserId',
+            'userFullName',
+            'userEmail',
+            'userRigId',
+            'userDescription',
+            'userPassword',
+            'userCurrentAssigneeName',
+            'userAssigneeEffectiveFrom',
+            'userAssigneeEffectiveTo',
+            'userAssigneeRemarks'
+        );
         $this->userRole = 'STO';
         $this->userActiveStatus = true;
+        $this->userHasAppAccess = true;
+        $this->userAssigneeEffectiveFrom = now()->toDateString();
     }
 
     private function resetRigForm(): void
@@ -427,15 +463,29 @@ class SettingsPage extends Component
         $this->reset('editingEventTypeId', 'eventTypeName', 'eventTypeDescription');
     }
 
-    private function writeRoleHistory(User $user): void
+    private function syncCurrentAssignee(User $user): void
     {
-        RoleHistory::query()->create([
-            'user_id' => $user->id,
-            'rig_id' => $user->rig_id,
-            'person_name' => $user->full_name,
-            'role' => $user->role,
-            'effective_from' => now()->toDateString(),
-        ]);
+        if (in_array($user->role, ['Management', 'Administrator'], true) || ! $user->rig_code) {
+            return;
+        }
+
+        $user->syncAssigneeSchedule(
+            $this->userCurrentAssigneeName,
+            $this->userAssigneeEffectiveFrom ?: now()->toDateString(),
+            $this->userAssigneeEffectiveTo ?: null,
+            $this->userAssigneeRemarks ?: null,
+        );
+    }
+
+    private function syncAppAccess(User $user): void
+    {
+        AccountAppAccess::query()->updateOrCreate(
+            [
+                'account_id' => $user->id,
+                'app_code' => config('er_drill.auth_app_code'),
+            ],
+            ['is_active' => $this->userHasAppAccess]
+        );
     }
 
     private function resolvePerPage(int $total, string $setting): int

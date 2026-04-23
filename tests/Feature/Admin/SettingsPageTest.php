@@ -86,10 +86,14 @@ class SettingsPageTest extends TestCase
 
         $this->actingAs($admin);
 
-        Livewire::test(SettingsPage::class)
+        $component = Livewire::test(SettingsPage::class);
+        $users = $component->viewData('users');
+
+        $this->assertCount(5, $users->items());
+        $this->assertSame(5, $users->perPage());
+
+        $component
             ->assertSee('Admin User')
-            ->assertSee('User 01')
-            ->assertSee('User 04')
             ->assertDontSee('User 05')
             ->assertDontSee('User 06');
     }

@@ -7,6 +7,7 @@ use App\Enums\UserRole;
 use App\Models\DrillRecord;
 use App\Models\DrillStatus;
 use App\Models\DrillWorkflowHistory;
+use App\Models\Rig;
 use App\Models\User;
 use App\Notifications\DrillApprovedNotification;
 use App\Notifications\DrillSubmittedNotification;
@@ -127,6 +128,10 @@ class DrillWorkflowService
         return DrillWorkflowHistory::query()->create([
             'drill_record_id' => $drillRecord->id,
             'actor_user_id' => $actor->id,
+            'actor_account_name' => $actor->full_name,
+            'actor_person_name' => $actor->currentAssigneeName(),
+            'actor_role_code' => $actor->role,
+            'actor_rig_code' => $actor->rig_code,
             'from_status_id' => $fromStatus?->id,
             'to_status_id' => $toStatus?->id,
             'action' => $action->value,
@@ -136,12 +141,15 @@ class DrillWorkflowService
 
     private function assignRigRoleAccounts(DrillRecord $drillRecord, User $actor): void
     {
+        $rigCode = Rig::query()->whereKey($drillRecord->rig_id)->value('code');
+
         $rigUsers = User::query()
-            ->where('rig_id', $drillRecord->rig_id)
+            ->withAppAccess(config('er_drill.auth_app_code'))
+            ->where('rig_code', $rigCode)
             ->where('active_status', true)
-            ->whereIn('role', [UserRole::STO->value, UserRole::BE->value, UserRole::OIM->value])
+            ->whereIn('role_code', [UserRole::STO->value, UserRole::BE->value, UserRole::OIM->value])
             ->get()
-            ->keyBy('role');
+            ->keyBy('role_code');
 
         $stoUser = $actor->role === UserRole::STO->value ? $actor : $rigUsers->get(UserRole::STO->value);
         $beUser = $rigUsers->get(UserRole::BE->value);
@@ -150,9 +158,9 @@ class DrillWorkflowService
         $drillRecord->sto_user_id = $stoUser?->id;
         $drillRecord->be_user_id = $beUser?->id;
         $drillRecord->oim_user_id = $oimUser?->id;
-        $drillRecord->sto_name = $stoUser?->full_name;
-        $drillRecord->be_name = $beUser?->full_name;
-        $drillRecord->oim_name = $oimUser?->full_name;
+        $drillRecord->sto_name = $stoUser?->currentAssigneeName();
+        $drillRecord->be_name = $beUser?->currentAssigneeName();
+        $drillRecord->oim_name = $oimUser?->currentAssigneeName();
     }
 
     private function generateReference(?int $rigId): string
@@ -179,13 +187,14 @@ class DrillWorkflowService
 
         if ($statusCode === 'approved') {
             $recipients = User::query()
+                ->withAppAccess(config('er_drill.auth_app_code'))
                 ->where('active_status', true)
                 ->where(function ($query) use ($drillRecord) {
                     $query
                         ->whereIn('id', array_filter([$drillRecord->sto_user_id, $drillRecord->be_user_id]))
                         ->orWhere(function ($subQuery) use ($drillRecord) {
-                            $subQuery->where('rig_id', $drillRecord->rig_id)
-                                ->where('role', UserRole::RM->value);
+                            $subQuery->where('rig_code', optional($drillRecord->rig)->code)
+                                ->where('role_code', UserRole::RM->value);
                         });
                 })
                 ->get();

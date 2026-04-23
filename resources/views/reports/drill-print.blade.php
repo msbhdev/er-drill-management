@@ -86,7 +86,20 @@
                 @foreach ($record->workflowHistory as $history)
                     <tr>
                         <td>{{ $record->rig->formatDateTime($history->created_at) }}</td>
-                        <td>{{ $history->actor?->full_name ?? 'System' }}</td>
+                        <td>
+                            {{ $history->actor_person_name ?? $history->actor?->currentAssigneeName() ?? 'System' }}
+                            @if ($history->actor_account_name)
+                                <div style="font-size: 10px; color: #6b7280;">
+                                    Account: {{ $history->actor_account_name }}
+                                    @if ($history->actor_role_code)
+                                        | Role: {{ $history->actor_role_code }}
+                                    @endif
+                                    @if ($history->actor_rig_code)
+                                        | Rig: {{ $history->actor_rig_code }}
+                                    @endif
+                                </div>
+                            @endif
+                        </td>
                         <td>{{ str($history->action)->replace('_', ' ')->headline() }}</td>
                         <td>{{ $history->comments }}</td>
                     </tr>

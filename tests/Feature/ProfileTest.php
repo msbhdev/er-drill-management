@@ -23,20 +23,20 @@ class ProfileTest extends TestCase
             ->assertSeeVolt('profile.update-password-form');
     }
 
-    public function test_users_can_update_their_full_name_from_the_profile_page(): void
+    public function test_users_can_update_their_current_holder_from_the_profile_page(): void
     {
         $now = now()->startOfSecond();
         $this->travelTo($now);
 
         $user = User::factory()->create([
-            'full_name' => 'Original Holder',
+            'full_name' => 'BER STO',
             'name_confirmed_at' => $now->copy()->subDays(21),
         ]);
 
         $this->actingAs($user);
 
         $component = Volt::test('profile.update-profile-information-form')
-            ->set('full_name', 'Updated Holder')
+            ->set('current_holder_name', 'Updated Holder')
             ->call('updateProfileInformation');
 
         $component
@@ -46,7 +46,8 @@ class ProfileTest extends TestCase
 
         $user->refresh();
 
-        $this->assertSame('Updated Holder', $user->full_name);
+        $this->assertSame('BER STO', $user->full_name);
+        $this->assertSame('Updated Holder', $user->currentAssigneeName());
         $this->assertTrue($user->name_confirmed_at->eq($now));
 
         $this->travelBack();
@@ -76,20 +77,20 @@ class ProfileTest extends TestCase
             ->assertSet('showModal', false);
     }
 
-    public function test_name_confirmation_modal_can_update_the_full_name(): void
+    public function test_name_confirmation_modal_can_update_the_current_holder(): void
     {
         $now = now()->startOfSecond();
         $this->travelTo($now);
 
         $user = User::factory()->create([
-            'full_name' => 'Old Name',
+            'full_name' => 'BER STO',
             'name_confirmed_at' => $now->copy()->subDays(30),
         ]);
 
         $this->actingAs($user);
 
         $component = Volt::test('profile.name-confirmation-modal')
-            ->set('full_name', 'Current Name')
+            ->set('current_holder_name', 'Current Name')
             ->call('save');
 
         $component
@@ -99,7 +100,8 @@ class ProfileTest extends TestCase
 
         $user->refresh();
 
-        $this->assertSame('Current Name', $user->full_name);
+        $this->assertSame('BER STO', $user->full_name);
+        $this->assertSame('Current Name', $user->currentAssigneeName());
         $this->assertTrue($user->name_confirmed_at->eq($now));
 
         $this->travelBack();

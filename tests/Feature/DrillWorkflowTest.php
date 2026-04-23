@@ -25,9 +25,9 @@ class DrillWorkflowTest extends TestCase
     public function test_sto_can_create_and_submit_a_drill(): void
     {
         $rig = Rig::factory()->create();
-        $sto = User::factory()->create(['role' => UserRole::STO->value, 'rig_id' => $rig->id]);
-        User::factory()->create(['role' => UserRole::BE->value, 'rig_id' => $rig->id]);
-        User::factory()->create(['role' => UserRole::OIM->value, 'rig_id' => $rig->id]);
+        $sto = User::factory()->create(['full_name' => 'BER STO', 'role' => UserRole::STO->value, 'rig_id' => $rig->id]);
+        User::factory()->create(['full_name' => 'BER BE', 'role' => UserRole::BE->value, 'rig_id' => $rig->id]);
+        User::factory()->create(['full_name' => 'BER OIM', 'role' => UserRole::OIM->value, 'rig_id' => $rig->id]);
 
         $drillType = DrillType::query()->create(['name' => 'Fire Drill', 'is_active' => true]);
         $eventType = EventType::query()->create(['name' => 'Fire', 'is_active' => true]);
@@ -50,6 +50,8 @@ class DrillWorkflowTest extends TestCase
         $this->assertSame('submitted', $record->status->code);
         $this->assertNotNull($record->submitted_at);
         $this->assertSame($sto->id, $record->sto_user_id);
+        $this->assertSame($sto->currentAssigneeName(), $record->sto_name);
+        $this->assertSame($sto->currentAssigneeName(), $record->workflowHistory()->latest('id')->first()->actor_person_name);
     }
 
     public function test_be_access_is_restricted_to_their_own_rig(): void

@@ -6,7 +6,7 @@ use Livewire\Volt\Component;
 new class extends Component
 {
     public $user;
-    public string $full_name = '';
+    public string $current_holder_name = '';
 
     public function mount(): void
     {
@@ -16,11 +16,17 @@ new class extends Component
     public function updateProfileInformation(): void
     {
         $validated = $this->validate([
-            'full_name' => ['required', 'string', 'max:255'],
+            'current_holder_name' => ['required', 'string', 'max:255'],
         ]);
 
         $user = Auth::user();
-        $user->confirmFullName($validated['full_name']);
+        $user->syncAssigneeSchedule(
+            $validated['current_holder_name'],
+            now()->toDateString(),
+            null,
+            'Updated from the profile page.'
+        );
+        $user->forceFill(['name_confirmed_at' => now()])->save();
 
         Auth::setUser($user->fresh()->load('rig'));
 
@@ -32,7 +38,7 @@ new class extends Component
     protected function refreshUser(): void
     {
         $this->user = Auth::user()->load('rig');
-        $this->full_name = $this->user->full_name;
+        $this->current_holder_name = $this->user->currentAssigneeName();
     }
 }; ?>
 
@@ -43,7 +49,7 @@ new class extends Component
         </h2>
 
         <p class="mt-1 text-sm text-stone-600">
-            Keep the account holder name current. This full name is used in drill reports, approval history, and audit records.
+            Keep the active onboard person current. The holder name is snapshotted into approvals, reports, and audit history.
         </p>
     </header>
 
@@ -51,12 +57,16 @@ new class extends Component
         <div class="grid gap-4 sm:grid-cols-2">
             <div class="rounded-3xl border border-stone-200 bg-stone-50 p-4">
                 <div class="text-xs font-semibold uppercase tracking-[0.25em] text-stone-500">Current holder</div>
-                <x-text-input wire:model="full_name" id="full_name" name="full_name" type="text" class="mt-3 block w-full rounded-2xl border-stone-300 bg-white text-lg font-bold text-stone-900" autocomplete="name" />
-                <x-input-error :messages="$errors->get('full_name')" class="mt-2" />
+                <x-text-input wire:model="current_holder_name" id="current_holder_name" name="current_holder_name" type="text" class="mt-3 block w-full rounded-2xl border-stone-300 bg-white text-lg font-bold text-stone-900" autocomplete="name" />
+                <x-input-error :messages="$errors->get('current_holder_name')" class="mt-2" />
             </div>
             <div class="rounded-3xl border border-stone-200 bg-stone-50 p-4">
                 <div class="text-xs font-semibold uppercase tracking-[0.25em] text-stone-500">Role</div>
                 <div class="mt-2 text-lg font-bold text-stone-900">{{ $user->role }}</div>
+            </div>
+            <div class="rounded-3xl border border-stone-200 bg-stone-50 p-4">
+                <div class="text-xs font-semibold uppercase tracking-[0.25em] text-stone-500">Account label</div>
+                <div class="mt-2 text-lg font-bold text-stone-900">{{ $user->full_name }}</div>
             </div>
             <div class="rounded-3xl border border-stone-200 bg-stone-50 p-4">
                 <div class="text-xs font-semibold uppercase tracking-[0.25em] text-stone-500">Rig assignment</div>
@@ -82,7 +92,7 @@ new class extends Component
             <div class="rounded-3xl border border-stone-200 bg-stone-50 p-4">
                 <div class="text-xs font-semibold uppercase tracking-[0.25em] text-stone-500">Update name</div>
                 <p class="mt-2 text-sm leading-6 text-stone-600">
-                    Confirm this name at least once every 14 days so the latest holder appears correctly in reports.
+                    Confirm the onboard person at least once every 14 days so the latest holder appears correctly in reports.
                 </p>
 
                 <div class="mt-4 flex items-center gap-4">

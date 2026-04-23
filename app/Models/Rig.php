@@ -11,6 +11,11 @@ class Rig extends Model
 {
     use HasFactory;
 
+    public function getConnectionName()
+    {
+        return config('database.default');
+    }
+
     protected $fillable = [
         'name',
         'code',

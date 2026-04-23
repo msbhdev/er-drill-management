@@ -3,10 +3,11 @@
 namespace Database\Seeders;
 
 use App\Enums\UserRole;
+use App\Models\AccountAppAccess;
 use App\Models\DrillType;
 use App\Models\EventType;
 use App\Models\Rig;
-use App\Models\RoleHistory;
+use App\Models\RoleAssigneeSchedule;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -59,7 +60,11 @@ class DatabaseSeeder extends Seeder
             $user = User::query()->firstOrCreate(
                 ['email' => $account['email']],
                 [
-                    ...$account,
+                    'full_name' => $account['full_name'],
+                    'email' => $account['email'],
+                    'account_type' => in_array($account['role'], [UserRole::Administrator->value, UserRole::Management->value], true) ? 'admin' : 'shared_role',
+                    'role' => $account['role'],
+                    'rig_id' => $account['rig_id'],
                     'active_status' => true,
                     'description' => 'Seeded shared role account',
                     'password' => Hash::make('password'),
@@ -68,17 +73,27 @@ class DatabaseSeeder extends Seeder
                 ]
             );
 
-            if ($user->rig_id) {
-                RoleHistory::query()->firstOrCreate(
+            AccountAppAccess::query()->firstOrCreate(
+                [
+                    'account_id' => $user->id,
+                    'app_code' => config('er_drill.auth_app_code'),
+                ],
+                ['is_active' => true]
+            );
+
+            if ($user->rig_code) {
+                RoleAssigneeSchedule::query()->firstOrCreate(
                     [
-                        'user_id' => $user->id,
-                        'effective_to' => null,
+                        'account_id' => $user->id,
+                        'effective_from' => now()->toDateString(),
                     ],
                     [
-                        'rig_id' => $user->rig_id,
                         'person_name' => $user->full_name,
-                        'role' => $user->role,
-                        'effective_from' => now()->toDateString(),
+                        'role_code' => $user->role,
+                        'rig_code' => $user->rig_code,
+                        'effective_to' => null,
+                        'remarks' => 'Seeded shared role account holder.',
+                        'active_status' => true,
                     ]
                 );
             }

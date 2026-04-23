@@ -13,6 +13,10 @@ class DrillWorkflowHistory extends Model
     protected $fillable = [
         'drill_record_id',
         'actor_user_id',
+        'actor_account_name',
+        'actor_person_name',
+        'actor_role_code',
+        'actor_rig_code',
         'from_status_id',
         'to_status_id',
         'action',

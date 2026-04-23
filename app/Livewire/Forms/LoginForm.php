@@ -33,7 +33,7 @@ class LoginForm extends Form
 
         $user = User::query()->where('email', $this->email)->first();
 
-        if (! $user || ! $user->active_status) {
+        if (! $user || ! $user->active_status || ! $user->hasAppAccess(config('er_drill.auth_app_code'))) {
             throw ValidationException::withMessages([
                 'form.email' => 'This account is inactive. Please contact the administrator.',
             ]);

@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <h2 class="text-2xl font-extrabold text-stone-900">Account Profile</h2>
-            <p class="mt-1 text-sm text-stone-600">Review your shared role assignment and maintain the account password.</p>
+            <p class="mt-1 text-sm text-stone-600">Review your shared role account, keep the onboard holder current, and maintain the account password.</p>
         </div>
     </x-slot>
 

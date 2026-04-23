@@ -94,6 +94,24 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_users_without_access_to_the_current_app_can_not_authenticate(): void
+    {
+        $user = User::factory()->create();
+        $user->appAccesses()->update(['is_active' => false]);
+
+        $component = Volt::test('pages.auth.login')
+            ->set('form.email', $user->email)
+            ->set('form.password', 'password');
+
+        $component->call('login');
+
+        $component
+            ->assertHasErrors(['form.email'])
+            ->assertNoRedirect();
+
+        $this->assertGuest();
+    }
+
     public function test_navigation_menu_can_be_rendered(): void
     {
         $user = User::factory()->create();

@@ -9,10 +9,10 @@
 
     <div class="grid gap-6 xl:grid-cols-2">
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
-            <h2 class="text-xl font-bold text-stone-950">{{ $editingUserId ? 'Edit User Account' : 'Create User Account' }}</h2>
+            <h2 class="text-xl font-bold text-stone-950">{{ $editingUserId ? 'Edit Shared Account' : 'Create Shared Account' }}</h2>
             <div class="mt-5 grid gap-4 md:grid-cols-2">
                 <div class="md:col-span-2">
-                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Full Name</label>
+                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Account Label</label>
                     <input wire:model="userFullName" type="text" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm">
                     @error('userFullName') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                 </div>
@@ -41,6 +41,32 @@
                 <div class="md:col-span-2">
                     <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Description</label>
                     <textarea wire:model="userDescription" rows="2" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Current Holder</label>
+                    <input wire:model="userCurrentAssigneeName" type="text" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(in_array($userRole, ['Management', 'Administrator'], true))>
+                    @error('userCurrentAssigneeName') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                </div>
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Access To This App</label>
+                    <label class="mt-2 inline-flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm font-semibold text-stone-700">
+                        <input wire:model="userHasAppAccess" type="checkbox" class="rounded border-stone-300 text-teal-700 focus:ring-teal-700">
+                        ER Drill enabled
+                    </label>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Holder Effective From</label>
+                    <input wire:model="userAssigneeEffectiveFrom" type="date" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(in_array($userRole, ['Management', 'Administrator'], true))>
+                    @error('userAssigneeEffectiveFrom') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                </div>
+                <div>
+                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Holder Effective To</label>
+                    <input wire:model="userAssigneeEffectiveTo" type="date" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(in_array($userRole, ['Management', 'Administrator'], true))>
+                    @error('userAssigneeEffectiveTo') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Holder Remarks</label>
+                    <textarea wire:model="userAssigneeRemarks" rows="2" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(in_array($userRole, ['Management', 'Administrator'], true))></textarea>
                 </div>
                 <div>
                     <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">{{ $editingUserId ? 'Reset Password' : 'Initial Password' }}</label>
@@ -97,6 +123,7 @@
                                     <td class="px-5 py-4">
                                         <div class="font-semibold text-stone-900">{{ $user->full_name }}</div>
                                         <div class="text-xs text-stone-500">{{ $user->email }}</div>
+                                        <div class="mt-1 text-xs text-stone-500">Holder: {{ $user->currentAssigneeName() }}</div>
                                     </td>
                                     <td class="px-4 py-4">{{ $user->role }}</td>
                                     <td class="px-4 py-4">{{ $user->rig?->name ?? 'All rigs' }}</td>
