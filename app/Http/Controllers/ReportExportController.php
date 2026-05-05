@@ -6,13 +6,17 @@ use App\Models\DrillAction;
 use App\Models\DrillRecord;
 use App\Services\DrillReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportExportController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(private readonly DrillReportService $reportService)
     {
     }
@@ -86,6 +90,23 @@ class ReportExportController extends Controller
 
         return Pdf::loadView('reports.drill-print', [
             'record' => $drillRecord,
+            'logoPath' => public_path('images/vantris-energy-berhad-logo.png'),
+            'attachmentsForPdf' => $this->attachmentsForPdf($drillRecord),
         ])->download("{$drillRecord->reference_no}.pdf");
+    }
+
+    private function attachmentsForPdf(DrillRecord $drillRecord)
+    {
+        return $drillRecord->attachments
+            ->map(function ($attachment) {
+                $path = Storage::disk('public')->path($attachment->file_path);
+
+                return [
+                    'caption' => $attachment->caption,
+                    'file_name' => $attachment->file_name ?: basename($attachment->file_path),
+                    'preview_path' => file_exists($path) && @getimagesize($path) ? $path : null,
+                ];
+            })
+            ->values();
     }
 }

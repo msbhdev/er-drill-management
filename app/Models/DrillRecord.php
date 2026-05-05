@@ -140,13 +140,20 @@ class DrillRecord extends Model
 
     public function isEditableBy(User $user): bool
     {
+        $editableStatusCodes = ['draft', 'returned_by_be', 'returned_by_oim'];
+        $statusCode = $this->status?->code;
+
+        if (! in_array($statusCode, $editableStatusCodes, true)) {
+            return false;
+        }
+
         if ($user->isAdministrator()) {
             return true;
         }
 
         return $user->role === UserRole::STO->value
             && $user->rig_id === $this->rig_id
-            && in_array($this->status?->code, ['draft', 'returned_by_be', 'returned_by_oim'], true);
+            && in_array($statusCode, $editableStatusCodes, true);
     }
 
     public function drillTypeNames(): string

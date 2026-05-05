@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Notifications\DrillApprovedNotification;
 use App\Notifications\DrillSubmittedNotification;
 use App\Notifications\DrillVerifiedNotification;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -21,7 +22,13 @@ class DrillWorkflowService
     public function saveDraft(DrillRecord $drillRecord, array $payload, User $actor): DrillRecord
     {
         return DB::transaction(function () use ($drillRecord, $payload, $actor) {
-            $status = DrillStatus::query()->where('code', 'draft')->firstOrFail();
+            $fromStatus = $drillRecord->exists ? $drillRecord->status()->first() : null;
+
+            if ($fromStatus && ! in_array($fromStatus->code, ['draft', 'returned_by_be', 'returned_by_oim'], true)) {
+                throw new AuthorizationException('This drill can no longer be edited as a draft.');
+            }
+
+            $status = $fromStatus ?? DrillStatus::query()->where('code', 'draft')->firstOrFail();
 
             $drillRecord->fill(Arr::except($payload, ['drill_type_ids', 'event_type_ids']));
             $drillRecord->status()->associate($status);
@@ -33,7 +40,7 @@ class DrillWorkflowService
             $drillRecord->save();
             $this->syncTypes($drillRecord, $payload);
 
-            $this->recordHistory($drillRecord, DrillWorkflowAction::SaveDraft, $actor, null, $status, 'Draft saved.');
+            $this->recordHistory($drillRecord, DrillWorkflowAction::SaveDraft, $actor, $fromStatus, $status, 'Draft saved.');
 
             return $drillRecord->fresh(['status', 'rig', 'drillType', 'eventType', 'drillTypes', 'eventTypes']);
         });
