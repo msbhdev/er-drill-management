@@ -105,44 +105,31 @@
                     </span>
                 </label>
             </div>
-            <div class="mt-5 overflow-hidden rounded-3xl border border-stone-200 bg-white">
-                <div class="max-h-[22.5rem] overflow-auto">
-                    <table class="min-w-full divide-y divide-stone-200 text-sm">
-                        <thead class="sticky top-0 bg-white/95 backdrop-blur">
-                            <tr class="text-left text-stone-500">
-                                <th class="px-5 pb-3 pt-4 font-semibold">User</th>
-                                <th class="px-4 pb-3 pt-4 font-semibold">Role</th>
-                                <th class="px-4 pb-3 pt-4 font-semibold">Rig</th>
-                                <th class="px-4 pb-3 pt-4 font-semibold">Status</th>
-                                <th class="px-5 pb-3 pt-4"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-stone-100">
-                            @foreach ($users as $user)
-                                <tr class="bg-white">
-                                    <td class="px-5 py-4">
-                                        <div class="font-semibold text-stone-900">{{ $user->full_name }}</div>
-                                        <div class="text-xs text-stone-500">{{ $user->email }}</div>
-                                        <div class="mt-1 text-xs text-stone-500">Holder: {{ $user->currentAssigneeName() }}</div>
-                                    </td>
-                                    <td class="px-4 py-4">{{ $user->role }}</td>
-                                    <td class="px-4 py-4">{{ $user->rig?->name ?? 'All rigs' }}</td>
-                                    <td class="px-4 py-4">
-                                        <span class="rounded-full {{ $user->active_status ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }} px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]">
-                                            {{ $user->active_status ? 'Active' : 'Disabled' }}
-                                        </span>
-                                    </td>
-                                    <td class="px-5 py-4 text-right">
-                                        <div class="flex justify-end gap-2">
-                                            <button wire:click="editUser({{ $user->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Edit</button>
-                                            <button wire:click="toggleUserActive({{ $user->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Toggle</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+            <div class="mt-5 max-h-[22.5rem] space-y-3 overflow-y-auto pr-1">
+                @foreach ($users as $user)
+                    <div class="rounded-3xl border border-stone-200 bg-stone-50 p-4">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div class="min-w-0 flex-1">
+                                <div class="truncate font-semibold text-stone-900">{{ $user->full_name }}</div>
+                                <div class="truncate text-xs text-stone-500">{{ $user->email }}</div>
+                                <div class="mt-1 truncate text-xs text-stone-500">Holder: {{ $user->currentAssigneeName() }}</div>
+                            </div>
+                            <span class="shrink-0 rounded-full {{ $user->active_status ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }} px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]">
+                                {{ $user->active_status ? 'Active' : 'Disabled' }}
+                            </span>
+                        </div>
+                        <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <span class="rounded-full bg-white px-3 py-1 font-semibold text-stone-700 ring-1 ring-stone-200">{{ $user->role }}</span>
+                                <span class="rounded-full bg-white px-3 py-1 font-semibold text-stone-700 ring-1 ring-stone-200">{{ $user->rig?->name ?? 'All rigs' }}</span>
+                            </div>
+                            <div class="flex flex-wrap justify-end gap-2">
+                                <button wire:click="editUser({{ $user->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Edit</button>
+                                <button wire:click="toggleUserActive({{ $user->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Toggle</button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
             <div class="mt-4">
                 {{ $users->links() }}

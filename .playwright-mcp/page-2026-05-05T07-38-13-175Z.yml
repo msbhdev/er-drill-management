@@ -1,0 +1,205 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - link "Vantris Energy Berhad ER Drill Management" [ref=e6] [cursor=pointer]:
+          - /url: http://er-drill.test/dashboard
+          - img "Vantris Energy Berhad" [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]: ER Drill
+            - generic [ref=e10]: Management
+        - generic [ref=e11]:
+          - link "Dashboard" [ref=e12] [cursor=pointer]:
+            - /url: http://er-drill.test/dashboard
+          - link "Drills" [ref=e13] [cursor=pointer]:
+            - /url: http://er-drill.test/drills
+          - link "Reports" [ref=e14] [cursor=pointer]:
+            - /url: http://er-drill.test/reports
+          - link "Admin" [ref=e15] [cursor=pointer]:
+            - /url: http://er-drill.test/admin/settings
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Vantris Administrator
+          - generic [ref=e19]: Administrator
+        - link "Profile" [ref=e20] [cursor=pointer]:
+          - /url: http://er-drill.test/profile
+        - button "Log Out" [ref=e21] [cursor=pointer]
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - generic [ref=e27]: Drill Record
+          - heading "ESP-20260504-061019-445" [level=1] [ref=e28]
+          - paragraph [ref=e29]: Capture drill details, response events, follow-up actions, attachments, and the workflow history for this exercise.
+        - generic [ref=e30]:
+          - generic [ref=e31]: Closed
+          - link "Download PDF" [ref=e32] [cursor=pointer]:
+            - /url: http://er-drill.test/drills/1/print
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - text: Rig
+              - combobox [disabled] [ref=e38]:
+                - option "Alliance"
+                - option "Berani"
+                - option "Esperanza" [selected]
+                - option "Jaya"
+                - option "Pelaut"
+            - generic [ref=e39]:
+              - text: Drill Date
+              - textbox [disabled] [ref=e40]: 2026-05-04
+            - generic [ref=e41]:
+              - text: Drill Time
+              - textbox [disabled] [ref=e42]: 08:10
+            - generic [ref=e43]:
+              - text: Event Location
+              - textbox [disabled] [ref=e44]: Galley
+            - generic [ref=e45]:
+              - text: Drill Type
+              - button "Fire Drill 1" [disabled] [ref=e47]:
+                - generic [ref=e48]: Fire Drill
+                - generic [ref=e49]:
+                  - generic [ref=e50]: "1"
+                  - img
+            - generic [ref=e52]:
+              - text: Event Type
+              - button "Fire, Gas Release +1 more 3" [disabled] [ref=e54]:
+                - generic [ref=e55]: Fire, Gas Release +1 more
+                - generic [ref=e56]:
+                  - generic [ref=e57]: "3"
+                  - img
+            - generic [ref=e59]:
+              - text: On Duty Crews
+              - textbox [disabled] [ref=e60]: Fire warden
+            - generic [ref=e61]:
+              - text: Scenario
+              - textbox [disabled] [ref=e62]: Smoke was seen coming out from the kitchen area
+            - generic [ref=e63]:
+              - text: Applicable DSHA
+              - textbox [disabled] [ref=e64]: Not applicable
+            - generic [ref=e65]:
+              - text: Performance Standard
+              - textbox [disabled] [ref=e66]: Not sure what this is
+            - generic [ref=e67]:
+              - text: Performance Result
+              - combobox [disabled] [ref=e68]:
+                - option "Select result"
+                - option "Yes" [selected]
+                - option "No"
+                - option "Partial"
+            - generic [ref=e69]:
+              - text: Objectives
+              - textbox [disabled] [ref=e70]: To eliminate the fire
+            - generic [ref=e71]:
+              - text: Debrief Attendees
+              - textbox [disabled] [ref=e72]: All POB
+            - generic [ref=e73]:
+              - text: Positive Observations
+              - textbox [disabled] [ref=e74]: Crew calmly muster at the muster station upon alarm
+            - generic [ref=e75]:
+              - text: Improvement Opportunities
+              - textbox [disabled] [ref=e76]: Response time of the on duty crew to assemble
+            - generic [ref=e77]:
+              - text: Other Comments
+              - textbox [disabled] [ref=e78]: Good job
+          - generic [ref=e79]:
+            - heading "Timeline Events" [level=2] [ref=e81]
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - textbox [disabled] [ref=e84]: 08:30
+                - textbox "Describe the event" [disabled] [ref=e85]: Muster alarm initiated
+              - generic [ref=e86]:
+                - textbox [disabled] [ref=e87]: 08:40
+                - textbox "Describe the event" [disabled] [ref=e88]: Crew muster at the muster station
+          - generic [ref=e89]:
+            - heading "Follow-up Actions" [level=2] [ref=e91]
+            - generic [ref=e93]:
+              - textbox "Describe the action item" [disabled] [ref=e95]
+              - textbox "Action owner" [disabled] [ref=e96]
+              - combobox [disabled] [ref=e97]:
+                - option "Open" [selected]
+                - option "In Progress"
+                - option "Closed"
+              - textbox [disabled] [ref=e98]
+          - generic [ref=e99]:
+            - heading "Attachments" [level=2] [ref=e101]
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - generic [ref=e105]: Vantris-Energy-Berhad-logo.png
+                - generic [ref=e106]: Initial smoke
+                - generic [ref=e107]: application/octet-stream Â· 13 KB
+              - link "Download" [ref=e109] [cursor=pointer]:
+                - /url: http://er-drill.test/attachments/1
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - heading "Workflow Actions" [level=2] [ref=e112]
+            - paragraph [ref=e113]: Only the role assigned to the current workflow step can progress or return the record.
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - generic [ref=e116]: STO Snapshot
+                - generic [ref=e117]: Esperanza STO Holder
+              - generic [ref=e118]:
+                - generic [ref=e119]: BE Snapshot
+                - generic [ref=e120]: Esperanza Barge Engineer Holder
+              - generic [ref=e121]:
+                - generic [ref=e122]: OIM Snapshot
+                - generic [ref=e123]: Esperanza OIM Holder
+            - generic [ref=e124]:
+              - text: Workflow Comments
+              - textbox [ref=e125]
+          - generic [ref=e126]:
+            - heading "Workflow History" [level=2] [ref=e127]
+            - generic [ref=e128]:
+              - generic [ref=e129]:
+                - generic [ref=e130]:
+                  - generic [ref=e131]:
+                    - generic [ref=e132]: Save Draft
+                    - generic [ref=e133]: Vantris Administrator · 04 May 2026 14:57
+                  - generic [ref=e134]: Draft
+                - paragraph [ref=e135]: Draft saved.
+              - generic [ref=e137]:
+                - generic [ref=e138]:
+                  - generic [ref=e139]: Close
+                  - generic [ref=e140]: Vantris Administrator · 04 May 2026 14:31
+                - generic [ref=e141]: Closed
+              - generic [ref=e143]:
+                - generic [ref=e144]:
+                  - generic [ref=e145]: Approve
+                  - generic [ref=e146]: Esperanza OIM · 04 May 2026 14:29
+                - generic [ref=e147]: Approved
+              - generic [ref=e148]:
+                - generic [ref=e149]:
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: Verify
+                    - generic [ref=e152]: Esperanza BE · 04 May 2026 14:13
+                  - generic [ref=e153]: Verified
+                - paragraph [ref=e154]: Drill for this date has been verified
+              - generic [ref=e155]:
+                - generic [ref=e156]:
+                  - generic [ref=e157]:
+                    - generic [ref=e158]: Save Draft
+                    - generic [ref=e159]: Esperanza STO · 04 May 2026 14:12
+                  - generic [ref=e160]: Draft
+                - paragraph [ref=e161]: Draft saved.
+              - generic [ref=e162]:
+                - generic [ref=e163]:
+                  - generic [ref=e164]:
+                    - generic [ref=e165]: Submit
+                    - generic [ref=e166]: Esperanza STO · 04 May 2026 14:12
+                  - generic [ref=e167]: Submitted
+                - paragraph [ref=e168]: Drill submitted for BE verification.
+              - generic [ref=e169]:
+                - generic [ref=e170]:
+                  - generic [ref=e171]:
+                    - generic [ref=e172]: Save Draft
+                    - generic [ref=e173]: Esperanza STO · 04 May 2026 14:11
+                  - generic [ref=e174]: Draft
+                - paragraph [ref=e175]: Draft saved.
+              - generic [ref=e176]:
+                - generic [ref=e177]:
+                  - generic [ref=e178]:
+                    - generic [ref=e179]: Save Draft
+                    - generic [ref=e180]: Esperanza STO · 04 May 2026 14:10
+                  - generic [ref=e181]: Draft
+                - paragraph [ref=e182]: Draft saved.

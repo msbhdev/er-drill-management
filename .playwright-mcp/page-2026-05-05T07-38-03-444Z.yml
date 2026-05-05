@@ -1,0 +1,100 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - link "Vantris Energy Berhad ER Drill Management" [ref=e6] [cursor=pointer]:
+          - /url: http://er-drill.test/dashboard
+          - img "Vantris Energy Berhad" [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]: ER Drill
+            - generic [ref=e10]: Management
+        - generic [ref=e11]:
+          - link "Dashboard" [ref=e12] [cursor=pointer]:
+            - /url: http://er-drill.test/dashboard
+          - link "Drills" [ref=e13] [cursor=pointer]:
+            - /url: http://er-drill.test/drills
+          - link "Reports" [ref=e14] [cursor=pointer]:
+            - /url: http://er-drill.test/reports
+          - link "Admin" [ref=e15] [cursor=pointer]:
+            - /url: http://er-drill.test/admin/settings
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Vantris Administrator
+          - generic [ref=e19]: Administrator
+        - link "Profile" [ref=e20] [cursor=pointer]:
+          - /url: http://er-drill.test/profile
+        - button "Log Out" [ref=e21] [cursor=pointer]
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - generic [ref=e26]: Drill Workspace
+          - heading "Drill Queue" [level=1] [ref=e27]
+          - paragraph [ref=e28]: Track drill records by rig, workflow stage, and drill attributes.
+        - link "New Drill Record" [ref=e29] [cursor=pointer]:
+          - /url: http://er-drill.test/drills/create
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - text: Search
+          - textbox "Reference, location, or scenario" [ref=e33]
+        - generic [ref=e34]:
+          - text: Status
+          - combobox [ref=e35]:
+            - option "All statuses" [selected]
+            - option "Draft"
+            - option "Submitted"
+            - option "Returned by BE"
+            - option "Verified"
+            - option "Returned by OIM"
+            - option "Approved"
+            - option "Closed"
+        - generic [ref=e36]:
+          - text: Rig
+          - combobox [ref=e37]:
+            - option "All rigs" [selected]
+            - option "Alliance"
+            - option "Berani"
+            - option "Esperanza"
+            - option "Jaya"
+            - option "Pelaut"
+        - generic [ref=e38]:
+          - text: Drill Type
+          - combobox [ref=e39]:
+            - option "All drill types" [selected]
+            - option "Fire Drill"
+            - option "Medical Drill"
+            - option "Muster Drill"
+        - generic [ref=e40]:
+          - text: Event Type
+          - combobox [ref=e41]:
+            - option "All event types" [selected]
+            - option "Fire"
+            - option "Gas Release"
+            - option "Man Overboard"
+        - generic [ref=e42]:
+          - text: Date From
+          - textbox [ref=e43]
+        - generic [ref=e44]:
+          - text: Date To
+          - textbox [ref=e45]
+      - table [ref=e48]:
+        - rowgroup [ref=e49]:
+          - row "Reference Rig Drill / Event Type Date Status" [ref=e50]:
+            - columnheader "Reference" [ref=e51]
+            - columnheader "Rig" [ref=e52]
+            - columnheader "Drill / Event Type" [ref=e53]
+            - columnheader "Date" [ref=e54]
+            - columnheader "Status" [ref=e55]
+            - columnheader [ref=e56]
+        - rowgroup [ref=e57]:
+          - row "ESP-20260504-061019-445 Esperanza Fire Drill Fire, Gas Release, Man Overboard 04 May 2026 Closed Open" [ref=e58]:
+            - cell "ESP-20260504-061019-445" [ref=e59]
+            - cell "Esperanza" [ref=e60]
+            - cell "Fire Drill Fire, Gas Release, Man Overboard" [ref=e61]:
+              - generic [ref=e62]: Fire Drill
+              - generic [ref=e63]: Fire, Gas Release, Man Overboard
+            - cell "04 May 2026" [ref=e64]
+            - cell "Closed" [ref=e65]
+            - cell "Open" [ref=e66]:
+              - link "Open" [ref=e67] [cursor=pointer]:
+                - /url: http://er-drill.test/drills/1

@@ -1,0 +1,133 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - link "Vantris Energy Berhad ER Drill Management" [ref=e6] [cursor=pointer]:
+          - /url: http://er-drill.test/dashboard
+          - img "Vantris Energy Berhad" [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]: ER Drill
+            - generic [ref=e10]: Management
+        - generic [ref=e11]:
+          - link "Dashboard" [ref=e12] [cursor=pointer]:
+            - /url: http://er-drill.test/dashboard
+          - link "Drills" [ref=e13] [cursor=pointer]:
+            - /url: http://er-drill.test/drills
+          - link "Reports" [ref=e14] [cursor=pointer]:
+            - /url: http://er-drill.test/reports
+          - link "Admin" [ref=e15] [cursor=pointer]:
+            - /url: http://er-drill.test/admin/settings
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Vantris Administrator
+          - generic [ref=e19]: Administrator
+        - link "Profile" [ref=e20] [cursor=pointer]:
+          - /url: http://er-drill.test/profile
+        - button "Log Out" [ref=e21] [cursor=pointer]
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - generic [ref=e26]:
+        - generic [ref=e27]: Drill Record
+        - heading "New Drill Submission" [level=1] [ref=e28]
+        - paragraph [ref=e29]: Capture drill details, response events, follow-up actions, attachments, and the workflow history for this exercise.
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e33]:
+            - generic [ref=e34]:
+              - text: Rig
+              - combobox [ref=e35]:
+                - option "Alliance" [selected]
+                - option "Berani"
+                - option "Esperanza"
+                - option "Jaya"
+                - option "Pelaut"
+            - generic [ref=e36]:
+              - text: Drill Date
+              - textbox [ref=e37]: 2026-05-05
+            - generic [ref=e38]:
+              - text: Drill Time
+              - textbox [ref=e39]
+            - generic [ref=e40]:
+              - text: Event Location
+              - textbox [ref=e41]
+            - generic [ref=e42]:
+              - text: Drill Type
+              - button "Select drill types" [ref=e44] [cursor=pointer]:
+                - generic [ref=e45]: Select drill types
+                - img [ref=e47]
+            - generic [ref=e49]:
+              - text: Event Type
+              - button "Select event types" [ref=e51] [cursor=pointer]:
+                - generic [ref=e52]: Select event types
+                - img [ref=e54]
+            - generic [ref=e56]:
+              - text: On Duty Crews
+              - textbox [ref=e57]
+            - generic [ref=e58]:
+              - text: Scenario
+              - textbox [ref=e59]
+            - generic [ref=e60]:
+              - text: Applicable DSHA
+              - textbox [ref=e61]
+            - generic [ref=e62]:
+              - text: Performance Standard
+              - textbox [ref=e63]
+            - generic [ref=e64]:
+              - text: Performance Result
+              - combobox [ref=e65]:
+                - option "Select result" [selected]
+                - option "Yes"
+                - option "No"
+                - option "Partial"
+            - generic [ref=e66]:
+              - text: Objectives
+              - textbox [ref=e67]
+            - generic [ref=e68]:
+              - text: Debrief Attendees
+              - textbox [ref=e69]
+            - generic [ref=e70]:
+              - text: Positive Observations
+              - textbox [ref=e71]
+            - generic [ref=e72]:
+              - text: Improvement Opportunities
+              - textbox [ref=e73]
+            - generic [ref=e74]:
+              - text: Other Comments
+              - textbox [ref=e75]
+          - generic [ref=e76]:
+            - generic [ref=e77]:
+              - heading "Timeline Events" [level=2] [ref=e78]
+              - button "Add Event" [ref=e79] [cursor=pointer]
+            - generic [ref=e81]:
+              - textbox [ref=e82]
+              - textbox "Describe the event" [ref=e83]
+              - button "Remove" [ref=e84] [cursor=pointer]
+          - generic [ref=e85]:
+            - generic [ref=e86]:
+              - heading "Follow-up Actions" [level=2] [ref=e87]
+              - button "Add Action" [ref=e88] [cursor=pointer]
+            - generic [ref=e90]:
+              - textbox "Describe the action item" [ref=e92]
+              - textbox "Action owner" [ref=e93]
+              - combobox [ref=e94]:
+                - option "Open" [selected]
+                - option "In Progress"
+                - option "Closed"
+              - textbox [ref=e95]
+              - button "Remove" [ref=e97] [cursor=pointer]
+          - generic [ref=e98]:
+            - generic [ref=e99]:
+              - heading "Attachments" [level=2] [ref=e100]
+              - button "Add Attachment" [ref=e101] [cursor=pointer]
+            - paragraph [ref=e102]: "Upload image attachments only. Maximum file size: 1.5 MB each."
+            - generic [ref=e104]: No attachments added yet.
+        - generic [ref=e106]:
+          - heading "Workflow Actions" [level=2] [ref=e107]
+          - paragraph [ref=e108]: Only the role assigned to the current workflow step can progress or return the record.
+          - generic [ref=e109]:
+            - button "Reset Form" [ref=e110] [cursor=pointer]
+            - button "Save Draft" [ref=e111] [cursor=pointer]
+            - button "Submit to BE" [ref=e112] [cursor=pointer]
+          - generic [ref=e113]:
+            - text: Workflow Comments
+            - textbox [ref=e114]

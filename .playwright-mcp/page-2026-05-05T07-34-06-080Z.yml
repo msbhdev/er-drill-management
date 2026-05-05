@@ -1,0 +1,79 @@
+- generic [ref=e44]:
+  - navigation [ref=e45]:
+    - generic [ref=e46]:
+      - generic [ref=e47]:
+        - link "Vantris Energy Berhad ER Drill Management" [ref=e48] [cursor=pointer]:
+          - /url: http://er-drill.test/dashboard
+          - img "Vantris Energy Berhad" [ref=e49]
+          - generic [ref=e50]:
+            - generic [ref=e51]: ER Drill
+            - generic [ref=e52]: Management
+        - generic [ref=e53]:
+          - link "Dashboard" [ref=e54] [cursor=pointer]:
+            - /url: http://er-drill.test/dashboard
+          - link "Drills" [ref=e55] [cursor=pointer]:
+            - /url: http://er-drill.test/drills
+          - link "Reports" [ref=e56] [cursor=pointer]:
+            - /url: http://er-drill.test/reports
+          - link "Admin" [ref=e57] [cursor=pointer]:
+            - /url: http://er-drill.test/admin/settings
+      - generic [ref=e58]:
+        - generic [ref=e59]:
+          - generic [ref=e60]: Vantris Administrator
+          - generic [ref=e61]: Administrator
+        - link "Profile" [ref=e62] [cursor=pointer]:
+          - /url: http://er-drill.test/profile
+        - button "Log Out" [ref=e63] [cursor=pointer]
+  - main [ref=e64]:
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - generic [ref=e67]:
+          - generic [ref=e68]: Operations Dashboard
+          - heading "Welcome back, Vantris Administrator" [level=1] [ref=e69]
+          - paragraph [ref=e70]: You are signed in as Administrator Use this dashboard to monitor outstanding drill work, approvals, and follow-up actions.
+        - generic [ref=e71]:
+          - generic [ref=e72]: Quick Actions
+          - generic [ref=e73]:
+            - link "Open Drill Queue" [ref=e74] [cursor=pointer]:
+              - /url: http://er-drill.test/drills
+            - link "Create New Drill" [ref=e75] [cursor=pointer]:
+              - /url: http://er-drill.test/drills/create
+            - link "Open Reports" [ref=e76] [cursor=pointer]:
+              - /url: http://er-drill.test/reports
+      - generic [ref=e77]:
+        - generic [ref=e78]:
+          - generic [ref=e79]: Total drills
+          - generic [ref=e80]: "1"
+        - generic [ref=e81]:
+          - generic [ref=e82]: Awaiting your action
+          - generic [ref=e83]: "0"
+        - generic [ref=e84]:
+          - generic [ref=e85]: Approved this month
+          - generic [ref=e86]: "1"
+        - generic [ref=e87]:
+          - generic [ref=e88]: Overdue actions
+          - generic [ref=e89]: "0"
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - generic [ref=e92]:
+            - heading "Recent Drill Records" [level=2] [ref=e93]
+            - paragraph [ref=e94]: Latest drill activity that matches your rig access.
+          - link "View All" [ref=e95] [cursor=pointer]:
+            - /url: http://er-drill.test/drills
+        - table [ref=e97]:
+          - rowgroup [ref=e98]:
+            - row "Reference Rig Drill Type Date Status" [ref=e99]:
+              - columnheader "Reference" [ref=e100]
+              - columnheader "Rig" [ref=e101]
+              - columnheader "Drill Type" [ref=e102]
+              - columnheader "Date" [ref=e103]
+              - columnheader "Status" [ref=e104]
+          - rowgroup [ref=e105]:
+            - row "ESP-20260504-061019-445 Esperanza Fire Drill 04 May 2026 Closed" [ref=e106]:
+              - cell "ESP-20260504-061019-445" [ref=e107]:
+                - link "ESP-20260504-061019-445" [ref=e108] [cursor=pointer]:
+                  - /url: http://er-drill.test/drills/1
+              - cell "Esperanza" [ref=e109]
+              - cell "Fire Drill" [ref=e110]
+              - cell "04 May 2026" [ref=e111]
+              - cell "Closed" [ref=e112]

@@ -1,0 +1,389 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - link "Vantris Energy Berhad ER Drill Management" [ref=e6] [cursor=pointer]:
+          - /url: http://er-drill.test/dashboard
+          - img "Vantris Energy Berhad" [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]: ER Drill
+            - generic [ref=e10]: Management
+        - generic [ref=e11]:
+          - link "Dashboard" [ref=e12] [cursor=pointer]:
+            - /url: http://er-drill.test/dashboard
+          - link "Drills" [ref=e13] [cursor=pointer]:
+            - /url: http://er-drill.test/drills
+          - link "Reports" [ref=e14] [cursor=pointer]:
+            - /url: http://er-drill.test/reports
+          - link "Admin" [ref=e15] [cursor=pointer]:
+            - /url: http://er-drill.test/admin/settings
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Vantris Administrator
+          - generic [ref=e19]: Administrator
+        - link "Profile" [ref=e20] [cursor=pointer]:
+          - /url: http://er-drill.test/profile
+        - button "Log Out" [ref=e21] [cursor=pointer]
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e25]: Administration
+        - heading "System Setup" [level=1] [ref=e26]
+        - paragraph [ref=e27]: Manage users, rigs, drill types, event types, and configurable status lists from one admin console.
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - heading "Create Shared Account" [level=2] [ref=e30]
+          - generic [ref=e31]:
+            - generic [ref=e32]:
+              - text: Account Label
+              - textbox [ref=e33]
+            - generic [ref=e34]:
+              - text: Email
+              - textbox [ref=e35]
+            - generic [ref=e36]:
+              - text: Role
+              - combobox [ref=e37]:
+                - option "STO" [selected]
+                - option "BE"
+                - option "OIM"
+                - option "RM"
+                - option "Management"
+                - option "Administrator"
+            - generic [ref=e38]:
+              - text: Rig
+              - combobox [ref=e39]:
+                - option "No rig" [selected]
+                - option "Alliance"
+                - option "Berani"
+                - option "Esperanza"
+                - option "Jaya"
+                - option "Pelaut"
+            - generic [ref=e40]:
+              - text: Description
+              - textbox [ref=e41]
+            - generic [ref=e42]:
+              - text: Current Holder
+              - textbox [ref=e43]
+            - generic [ref=e44]:
+              - text: Access To This App
+              - generic [ref=e45]:
+                - checkbox "ER Drill enabled" [checked] [ref=e46]
+                - text: ER Drill enabled
+            - generic [ref=e47]:
+              - text: Holder Effective From
+              - textbox [ref=e48]: 2026-05-05
+            - generic [ref=e49]:
+              - text: Holder Effective To
+              - textbox [ref=e50]
+            - generic [ref=e51]:
+              - text: Holder Remarks
+              - textbox [ref=e52]
+            - generic [ref=e53]:
+              - text: Initial Password
+              - textbox [ref=e54]
+            - generic [ref=e56]:
+              - checkbox "Active account" [checked] [ref=e57]
+              - text: Active account
+          - button "Save User" [ref=e59] [cursor=pointer]
+        - generic [ref=e60]:
+          - generic [ref=e61]:
+            - heading "User Accounts" [level=2] [ref=e62]
+            - generic [ref=e63]:
+              - generic [ref=e64]: Show
+              - generic [ref=e65]:
+                - button "Show 10 30 50 All" [ref=e66] [cursor=pointer]: "5"
+                - button "10" [ref=e67] [cursor=pointer]
+                - button "30" [ref=e68] [cursor=pointer]
+                - button "50" [ref=e69] [cursor=pointer]
+                - button "All" [ref=e70] [cursor=pointer]
+          - table [ref=e73]:
+            - rowgroup [ref=e74]:
+              - row "User Role Rig Status" [ref=e75]:
+                - columnheader "User" [ref=e76]
+                - columnheader "Role" [ref=e77]
+                - columnheader "Rig" [ref=e78]
+                - columnheader "Status" [ref=e79]
+                - columnheader [ref=e80]
+            - rowgroup [ref=e81]:
+              - 'row "Vantris Administrator admin@vantris.com Holder: Vantris Administrator Administrator All rigs Active Edit Toggle" [ref=e82]':
+                - 'cell "Vantris Administrator admin@vantris.com Holder: Vantris Administrator" [ref=e83]':
+                  - generic [ref=e84]: Vantris Administrator
+                  - generic [ref=e85]: admin@vantris.com
+                  - generic [ref=e86]: "Holder: Vantris Administrator"
+                - cell "Administrator" [ref=e87]
+                - cell "All rigs" [ref=e88]
+                - cell "Active" [ref=e89]
+                - cell "Edit Toggle" [ref=e90]:
+                  - generic [ref=e91]:
+                    - button "Edit" [ref=e92] [cursor=pointer]
+                    - button "Toggle" [ref=e93] [cursor=pointer]
+              - 'row "Alliance BE bargeengr.alliance@vantrisenergy.com Holder: Alliance Barge Engineer Holder BE Alliance Active Edit Toggle" [ref=e94]':
+                - 'cell "Alliance BE bargeengr.alliance@vantrisenergy.com Holder: Alliance Barge Engineer Holder" [ref=e95]':
+                  - generic [ref=e96]: Alliance BE
+                  - generic [ref=e97]: bargeengr.alliance@vantrisenergy.com
+                  - generic [ref=e98]: "Holder: Alliance Barge Engineer Holder"
+                - cell "BE" [ref=e99]
+                - cell "Alliance" [ref=e100]
+                - cell "Active" [ref=e101]
+                - cell "Edit Toggle" [ref=e102]:
+                  - generic [ref=e103]:
+                    - button "Edit" [ref=e104] [cursor=pointer]
+                    - button "Toggle" [ref=e105] [cursor=pointer]
+              - 'row "Berani BE bargeengr.berani@vantrisenergy.com Holder: Berani Barge Engineer Holder BE Berani Active Edit Toggle" [ref=e106]':
+                - 'cell "Berani BE bargeengr.berani@vantrisenergy.com Holder: Berani Barge Engineer Holder" [ref=e107]':
+                  - generic [ref=e108]: Berani BE
+                  - generic [ref=e109]: bargeengr.berani@vantrisenergy.com
+                  - generic [ref=e110]: "Holder: Berani Barge Engineer Holder"
+                - cell "BE" [ref=e111]
+                - cell "Berani" [ref=e112]
+                - cell "Active" [ref=e113]
+                - cell "Edit Toggle" [ref=e114]:
+                  - generic [ref=e115]:
+                    - button "Edit" [ref=e116] [cursor=pointer]
+                    - button "Toggle" [ref=e117] [cursor=pointer]
+              - 'row "Esperanza BE bargeengr.esperanza@vantrisenergy.com Holder: Esperanza Barge Engineer Holder BE Esperanza Active Edit Toggle" [ref=e118]':
+                - 'cell "Esperanza BE bargeengr.esperanza@vantrisenergy.com Holder: Esperanza Barge Engineer Holder" [ref=e119]':
+                  - generic [ref=e120]: Esperanza BE
+                  - generic [ref=e121]: bargeengr.esperanza@vantrisenergy.com
+                  - generic [ref=e122]: "Holder: Esperanza Barge Engineer Holder"
+                - cell "BE" [ref=e123]
+                - cell "Esperanza" [ref=e124]
+                - cell "Active" [ref=e125]
+                - cell "Edit Toggle" [ref=e126]:
+                  - generic [ref=e127]:
+                    - button "Edit" [ref=e128] [cursor=pointer]
+                    - button "Toggle" [ref=e129] [cursor=pointer]
+              - 'row "Jaya BE bargeengr.jaya@vantrisenergy.com Holder: Jaya Barge Engineer Holder BE Jaya Active Edit Toggle" [ref=e130]':
+                - 'cell "Jaya BE bargeengr.jaya@vantrisenergy.com Holder: Jaya Barge Engineer Holder" [ref=e131]':
+                  - generic [ref=e132]: Jaya BE
+                  - generic [ref=e133]: bargeengr.jaya@vantrisenergy.com
+                  - generic [ref=e134]: "Holder: Jaya Barge Engineer Holder"
+                - cell "BE" [ref=e135]
+                - cell "Jaya" [ref=e136]
+                - cell "Active" [ref=e137]
+                - cell "Edit Toggle" [ref=e138]:
+                  - generic [ref=e139]:
+                    - button "Edit" [ref=e140] [cursor=pointer]
+                    - button "Toggle" [ref=e141] [cursor=pointer]
+          - navigation "Pagination Navigation" [ref=e144]:
+            - generic [ref=e145]:
+              - paragraph [ref=e147]: Showing 1 to 5 of 31 results
+              - generic [ref=e149]:
+                - generic "&laquo; Previous" [ref=e151]:
+                  - img [ref=e153]
+                - generic [ref=e157]: "1"
+                - button "Go to page 2" [ref=e159] [cursor=pointer]: "2"
+                - button "Go to page 3" [ref=e161] [cursor=pointer]: "3"
+                - button "Go to page 4" [ref=e163] [cursor=pointer]: "4"
+                - button "Go to page 5" [ref=e165] [cursor=pointer]: "5"
+                - button "Go to page 6" [ref=e167] [cursor=pointer]: "6"
+                - button "Go to page 7" [ref=e169] [cursor=pointer]: "7"
+                - button "Next &raquo;" [ref=e171] [cursor=pointer]:
+                  - img [ref=e172]
+      - generic [ref=e174]:
+        - generic [ref=e175]:
+          - generic [ref=e176]:
+            - heading "Rigs" [level=2] [ref=e177]
+            - generic [ref=e178]:
+              - generic [ref=e179]: Show
+              - generic [ref=e180]:
+                - button "Show 10 30 50 All" [ref=e181] [cursor=pointer]: "5"
+                - button "10" [ref=e182] [cursor=pointer]
+                - button "30" [ref=e183] [cursor=pointer]
+                - button "50" [ref=e184] [cursor=pointer]
+                - button "All" [ref=e185] [cursor=pointer]
+          - generic [ref=e186]:
+            - textbox "Rig name" [ref=e187]
+            - textbox "Code" [ref=e188]
+            - textbox "Location" [ref=e189]
+            - combobox [ref=e190]:
+              - option "Kuala Lumpur (UTC+8)" [selected]
+              - option "Bangkok (UTC+7)"
+              - option "UTC"
+          - button "Add Rig" [ref=e192] [cursor=pointer]
+          - generic [ref=e193]:
+            - generic [ref=e194]:
+              - generic [ref=e195]:
+                - generic [ref=e196]: Alliance (ALL)
+                - generic [ref=e197]: Malaysia
+                - generic [ref=e198]: Kuala Lumpur (UTC+8)
+              - generic [ref=e199]:
+                - button "Edit" [ref=e200] [cursor=pointer]
+                - button "Disable" [ref=e201] [cursor=pointer]
+            - generic [ref=e202]:
+              - generic [ref=e203]:
+                - generic [ref=e204]: Berani (BER)
+                - generic [ref=e205]: Malaysia
+                - generic [ref=e206]: Kuala Lumpur (UTC+8)
+              - generic [ref=e207]:
+                - button "Edit" [ref=e208] [cursor=pointer]
+                - button "Disable" [ref=e209] [cursor=pointer]
+            - generic [ref=e210]:
+              - generic [ref=e211]:
+                - generic [ref=e212]: Esperanza (ESP)
+                - generic [ref=e213]: Malaysia
+                - generic [ref=e214]: Kuala Lumpur (UTC+8)
+              - generic [ref=e215]:
+                - button "Edit" [ref=e216] [cursor=pointer]
+                - button "Disable" [ref=e217] [cursor=pointer]
+            - generic [ref=e218]:
+              - generic [ref=e219]:
+                - generic [ref=e220]: Jaya (JAY)
+                - generic [ref=e221]: Malaysia
+                - generic [ref=e222]: Kuala Lumpur (UTC+8)
+              - generic [ref=e223]:
+                - button "Edit" [ref=e224] [cursor=pointer]
+                - button "Disable" [ref=e225] [cursor=pointer]
+            - generic [ref=e226]:
+              - generic [ref=e227]:
+                - generic [ref=e228]: Pelaut (PEL)
+                - generic [ref=e229]: Malaysia
+                - generic [ref=e230]: Kuala Lumpur (UTC+8)
+              - generic [ref=e231]:
+                - button "Edit" [ref=e232] [cursor=pointer]
+                - button "Disable" [ref=e233] [cursor=pointer]
+        - generic [ref=e234]:
+          - generic [ref=e235]:
+            - heading "Drill Types" [level=2] [ref=e236]
+            - generic [ref=e237]:
+              - generic [ref=e238]: Show
+              - generic [ref=e239]:
+                - button "Show 10 30 50 All" [ref=e240] [cursor=pointer]: "5"
+                - button "10" [ref=e241] [cursor=pointer]
+                - button "30" [ref=e242] [cursor=pointer]
+                - button "50" [ref=e243] [cursor=pointer]
+                - button "All" [ref=e244] [cursor=pointer]
+          - generic [ref=e245]:
+            - textbox "Drill type name" [ref=e246]
+            - textbox "Description" [ref=e247]
+          - button "Add Drill Type" [ref=e249] [cursor=pointer]
+          - generic [ref=e250]:
+            - generic [ref=e251]:
+              - generic [ref=e252]:
+                - generic [ref=e253]: Fire Drill
+                - generic [ref=e254]: Emergency fire response drill
+              - generic [ref=e255]:
+                - button "Edit" [ref=e256] [cursor=pointer]
+                - button "Disable" [ref=e257] [cursor=pointer]
+                - button "Delete" [ref=e258] [cursor=pointer]
+            - generic [ref=e259]:
+              - generic [ref=e260]:
+                - generic [ref=e261]: Medical Drill
+                - generic [ref=e262]: Emergency medical response simulation
+              - generic [ref=e263]:
+                - button "Edit" [ref=e264] [cursor=pointer]
+                - button "Disable" [ref=e265] [cursor=pointer]
+                - button "Delete" [ref=e266] [cursor=pointer]
+            - generic [ref=e267]:
+              - generic [ref=e268]:
+                - generic [ref=e269]: Muster Drill
+                - generic [ref=e270]: Evacuation and accountability drill
+              - generic [ref=e271]:
+                - button "Edit" [ref=e272] [cursor=pointer]
+                - button "Disable" [ref=e273] [cursor=pointer]
+                - button "Delete" [ref=e274] [cursor=pointer]
+        - generic [ref=e275]:
+          - generic [ref=e276]:
+            - heading "Event Types" [level=2] [ref=e277]
+            - generic [ref=e278]:
+              - generic [ref=e279]: Show
+              - generic [ref=e280]:
+                - button "Show 10 30 50 All" [ref=e281] [cursor=pointer]: "5"
+                - button "10" [ref=e282] [cursor=pointer]
+                - button "30" [ref=e283] [cursor=pointer]
+                - button "50" [ref=e284] [cursor=pointer]
+                - button "All" [ref=e285] [cursor=pointer]
+          - generic [ref=e286]:
+            - textbox "Event type name" [ref=e287]
+            - textbox "Description" [ref=e288]
+          - button "Add Event Type" [ref=e290] [cursor=pointer]
+          - generic [ref=e291]:
+            - generic [ref=e292]:
+              - generic [ref=e293]:
+                - generic [ref=e294]: Fire
+                - generic [ref=e295]: Fire or smoke related event
+              - generic [ref=e296]:
+                - button "Edit" [ref=e297] [cursor=pointer]
+                - button "Disable" [ref=e298] [cursor=pointer]
+                - button "Delete" [ref=e299] [cursor=pointer]
+            - generic [ref=e300]:
+              - generic [ref=e301]:
+                - generic [ref=e302]: Gas Release
+                - generic [ref=e303]: Gas detection and response event
+              - generic [ref=e304]:
+                - button "Edit" [ref=e305] [cursor=pointer]
+                - button "Disable" [ref=e306] [cursor=pointer]
+                - button "Delete" [ref=e307] [cursor=pointer]
+            - generic [ref=e308]:
+              - generic [ref=e309]:
+                - generic [ref=e310]: Man Overboard
+                - generic [ref=e311]: Marine rescue event
+              - generic [ref=e312]:
+                - button "Edit" [ref=e313] [cursor=pointer]
+                - button "Disable" [ref=e314] [cursor=pointer]
+                - button "Delete" [ref=e315] [cursor=pointer]
+        - generic [ref=e316]:
+          - heading "Configurable Statuses" [level=2] [ref=e317]
+          - generic [ref=e318]:
+            - generic [ref=e319]:
+              - generic [ref=e320]:
+                - textbox "Drill status name" [ref=e321]
+                - textbox "Drill status code" [ref=e322]
+              - button "Add Drill Status" [ref=e323] [cursor=pointer]
+              - generic [ref=e324]:
+                - generic [ref=e325]:
+                  - generic [ref=e326]:
+                    - generic [ref=e327]: Draft
+                    - generic [ref=e328]: draft
+                  - button "Toggle" [ref=e329] [cursor=pointer]
+                - generic [ref=e330]:
+                  - generic [ref=e331]:
+                    - generic [ref=e332]: Submitted
+                    - generic [ref=e333]: submitted
+                  - button "Toggle" [ref=e334] [cursor=pointer]
+                - generic [ref=e335]:
+                  - generic [ref=e336]:
+                    - generic [ref=e337]: Returned by BE
+                    - generic [ref=e338]: returned_by_be
+                  - button "Toggle" [ref=e339] [cursor=pointer]
+                - generic [ref=e340]:
+                  - generic [ref=e341]:
+                    - generic [ref=e342]: Verified
+                    - generic [ref=e343]: verified
+                  - button "Toggle" [ref=e344] [cursor=pointer]
+                - generic [ref=e345]:
+                  - generic [ref=e346]:
+                    - generic [ref=e347]: Returned by OIM
+                    - generic [ref=e348]: returned_by_oim
+                  - button "Toggle" [ref=e349] [cursor=pointer]
+                - generic [ref=e350]:
+                  - generic [ref=e351]:
+                    - generic [ref=e352]: Approved
+                    - generic [ref=e353]: approved
+                  - button "Toggle" [ref=e354] [cursor=pointer]
+                - generic [ref=e355]:
+                  - generic [ref=e356]:
+                    - generic [ref=e357]: Closed
+                    - generic [ref=e358]: closed
+                  - button "Toggle" [ref=e359] [cursor=pointer]
+            - generic [ref=e360]:
+              - generic [ref=e361]:
+                - textbox "Action status name" [ref=e362]
+                - textbox "Action status code" [ref=e363]
+              - button "Add Action Status" [ref=e364] [cursor=pointer]
+              - generic [ref=e365]:
+                - generic [ref=e366]:
+                  - generic [ref=e367]:
+                    - generic [ref=e368]: Open
+                    - generic [ref=e369]: open
+                  - button "Toggle" [ref=e370] [cursor=pointer]
+                - generic [ref=e371]:
+                  - generic [ref=e372]:
+                    - generic [ref=e373]: In Progress
+                    - generic [ref=e374]: in_progress
+                  - button "Toggle" [ref=e375] [cursor=pointer]
+                - generic [ref=e376]:
+                  - generic [ref=e377]:
+                    - generic [ref=e378]: Closed
+                    - generic [ref=e379]: closed
+                  - button "Toggle" [ref=e380] [cursor=pointer]

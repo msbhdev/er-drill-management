@@ -50,27 +50,25 @@
                     </div>
                     <div>
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Drill Type</label>
-                        <div class="mt-2 max-h-44 space-y-2 overflow-y-auto rounded-2xl border border-stone-200 bg-stone-50 p-3">
-                            @foreach ($drillTypes as $drillType)
-                                <label class="flex items-center gap-3 rounded-2xl bg-white px-3 py-2 text-sm text-stone-700">
-                                    <input wire:model="drillTypeIds" type="checkbox" value="{{ $drillType->id }}" class="rounded border-stone-300 text-teal-700 focus:ring-teal-700" @disabled(! $editable)>
-                                    <span>{{ $drillType->name }}</span>
-                                </label>
-                            @endforeach
-                        </div>
+                        <x-multiselect-dropdown
+                            :options="$drillTypes->map(fn ($t) => ['id' => $t->id, 'name' => $t->name])->all()"
+                            wire-model="drillTypeIds"
+                            placeholder="Select drill types"
+                            search-placeholder="Search drill types"
+                            :disabled="! $editable"
+                        />
                         @error('drillTypeIds') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                         @error('drillTypeIds.*') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Event Type</label>
-                        <div class="mt-2 max-h-44 space-y-2 overflow-y-auto rounded-2xl border border-stone-200 bg-stone-50 p-3">
-                            @foreach ($eventTypes as $eventType)
-                                <label class="flex items-center gap-3 rounded-2xl bg-white px-3 py-2 text-sm text-stone-700">
-                                    <input wire:model="eventTypeIds" type="checkbox" value="{{ $eventType->id }}" class="rounded border-stone-300 text-teal-700 focus:ring-teal-700" @disabled(! $editable)>
-                                    <span>{{ $eventType->name }}</span>
-                                </label>
-                            @endforeach
-                        </div>
+                        <x-multiselect-dropdown
+                            :options="$eventTypes->map(fn ($t) => ['id' => $t->id, 'name' => $t->name])->all()"
+                            wire-model="eventTypeIds"
+                            placeholder="Select event types"
+                            search-placeholder="Search event types"
+                            :disabled="! $editable"
+                        />
                         @error('eventTypeIds') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                         @error('eventTypeIds.*') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
