@@ -21,7 +21,8 @@
             if (idx === -1) { next.push(numericId); } else { next.splice(idx, 1); }
             this.selected = next;
         },
-        clearAll() { this.selected = []; this.search = ''; },
+        clearAll() { this.selected = []; },
+        clearSearch() { this.search = ''; },
         get filtered() {
             const q = this.search.trim().toLowerCase();
             return q ? this.options.filter((o) => o.name.toLowerCase().includes(q)) : this.options;
@@ -63,12 +64,24 @@
         class="absolute left-0 right-0 z-30 mt-2 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-xl shadow-stone-900/10"
     >
         <div class="border-b border-stone-100 bg-stone-50 p-2">
-            <input
-                x-model="search"
-                type="text"
-                placeholder="{{ $searchPlaceholder }}"
-                class="w-full rounded-xl border-stone-200 bg-white text-sm"
-            >
+            <div class="relative">
+                <input
+                    x-model="search"
+                    type="text"
+                    placeholder="{{ $searchPlaceholder }}"
+                    class="w-full rounded-xl border-stone-200 bg-white pr-9 text-sm"
+                >
+                <button
+                    type="button"
+                    x-show="search.length > 0"
+                    x-cloak
+                    @click="clearSearch()"
+                    class="absolute inset-y-0 right-2 my-auto flex h-6 w-6 items-center justify-center rounded-full text-stone-500 hover:bg-stone-100 hover:text-stone-700"
+                    aria-label="Clear search"
+                >
+                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
         </div>
         <ul class="max-h-56 overflow-y-auto py-1">
             <template x-for="opt in filtered" :key="opt.id">
