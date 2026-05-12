@@ -31,6 +31,9 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::get('drills/{drillRecord}/print', [ReportExportController::class, 'drillPdf'])
         ->name('drills.print');
 
+    Route::get('drills/{drillRecord}/view', [ReportExportController::class, 'drillPdfView'])
+        ->name('drills.view');
+
     Route::get('reports', ReportsIndexPage::class)
         ->middleware('role:RM,Management,Administrator')
         ->name('reports.index');

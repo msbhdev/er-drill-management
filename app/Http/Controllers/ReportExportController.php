@@ -95,6 +95,32 @@ class ReportExportController extends Controller
         ])->download("{$drillRecord->reference_no}.pdf");
     }
 
+    public function drillPdfView(Request $request, DrillRecord $drillRecord)
+    {
+        $this->authorize('view', $drillRecord);
+
+        $drillRecord->load([
+            'rig',
+            'drillType',
+            'eventType',
+            'drillTypes',
+            'eventTypes',
+            'status',
+            'events',
+            'actions.status',
+            'attachments',
+            'workflowHistory.actor',
+            'workflowHistory.fromStatus',
+            'workflowHistory.toStatus',
+        ]);
+
+        return Pdf::loadView('reports.drill-print', [
+            'record' => $drillRecord,
+            'logoPath' => public_path('images/vantris-energy-berhad-logo.png'),
+            'attachmentsForPdf' => $this->attachmentsForPdf($drillRecord),
+        ])->stream("{$drillRecord->reference_no}.pdf");
+    }
+
     private function attachmentsForPdf(DrillRecord $drillRecord)
     {
         return $drillRecord->attachments

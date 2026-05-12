@@ -20,6 +20,8 @@ class SettingsPage extends Component
 
     protected string $paginationTheme = 'tailwind';
 
+    public string $userSearch = '';
+
     public string $userRecordsPerPage = '5';
     public string $rigRecordsPerPage = '5';
     public string $drillTypeRecordsPerPage = '5';
@@ -379,6 +381,11 @@ class SettingsPage extends Component
         $this->resetPage('usersPage');
     }
 
+    public function updatedUserSearch(): void
+    {
+        $this->resetPage('usersPage');
+    }
+
     public function updatedRigRecordsPerPage(): void
     {
         $this->resetPage('rigsPage');
@@ -400,6 +407,15 @@ class SettingsPage extends Component
             ->with('rig')
             ->orderBy('role_code')
             ->orderBy('full_name');
+
+        $search = trim($this->userSearch);
+        if ($search !== '') {
+            $like = '%'.$search.'%';
+            $userQuery->where(function ($query) use ($like) {
+                $query->where('full_name', 'like', $like)
+                    ->orWhere('email', 'like', $like);
+            });
+        }
 
         $rigQuery = Rig::query()->orderBy('name');
         $drillTypeQuery = DrillType::query()->orderBy('name');

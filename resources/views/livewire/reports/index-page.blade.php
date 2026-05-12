@@ -15,16 +15,7 @@
         <div>
             <div class="text-sm font-semibold uppercase tracking-[0.24em] text-stone-500">Reporting</div>
             <h1 class="mt-2 text-3xl font-extrabold text-stone-950">Drill Reports</h1>
-            <p class="mt-2 text-sm text-stone-600">Filter the drill register, track returned approvals, and export the current report view.</p>
-        </div>
-
-        <div class="flex flex-wrap gap-3">
-            <a href="{{ route('reports.export.excel', $query) }}" class="rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white shadow-xl shadow-stone-900/15">
-                Export Excel
-            </a>
-            <a href="{{ route('reports.export.pdf', $query) }}" class="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700">
-                Export PDF
-            </a>
+            <p class="mt-2 text-sm text-stone-600">Filter the drill register and track returned approvals.</p>
         </div>
     </section>
 
@@ -116,7 +107,16 @@
                 <tbody class="divide-y divide-stone-100">
                     @forelse ($records as $record)
                         <tr class="text-stone-700">
-                            <td class="py-4 font-semibold text-stone-900">{{ $record->reference_no }}</td>
+                            <td class="py-4 font-semibold">
+                                <a
+                                    href="{{ route('drills.view', $record) }}"
+                                    target="_blank"
+                                    rel="noopener"
+                                    class="text-stone-900 underline-offset-4 hover:text-stone-600 hover:underline"
+                                >
+                                    {{ $record->reference_no }}
+                                </a>
+                            </td>
                             <td class="py-4">{{ $record->rig->name }}</td>
                             <td class="py-4">
                                 <div class="font-semibold">{{ $record->drillTypeNames() }}</div>
