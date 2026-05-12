@@ -23,6 +23,8 @@
 /vendor
 /.tools
 /__laravel_scaffold
+/.playwright-mcp
+/screenshot
 _ide_helper.php
 Homestead.json
 Homestead.yaml
