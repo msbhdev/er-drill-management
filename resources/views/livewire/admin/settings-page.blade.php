@@ -88,35 +88,33 @@
         </section>
 
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
-            <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <h2 class="text-xl font-bold text-stone-950">User Accounts</h2>
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                    <div class="relative sm:w-72">
-                        <svg class="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-stone-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 3.473 9.78l3.124 3.124a.75.75 0 1 0 1.06-1.06l-3.124-3.125A5.5 5.5 0 0 0 9 3.5ZM5 9a4 4 0 1 1 8 0 4 4 0 0 1-8 0Z" clip-rule="evenodd" />
-                        </svg>
-                        <input
-                            type="search"
-                            wire:model.live.debounce.300ms="userSearch"
-                            placeholder="Search by name or email"
-                            class="w-full rounded-full border-stone-300 bg-stone-50 py-2 pl-10 pr-4 text-sm placeholder:text-stone-400 focus:border-stone-400 focus:ring-stone-400"
-                        >
-                    </div>
-                    <label class="flex items-center gap-3 text-sm text-stone-600">
-                        <span>Show</span>
-                        <span class="inline-flex flex-wrap gap-2">
-                            @foreach ($pageSizeOptions as $option)
-                                <button
-                                    wire:click="$set('userRecordsPerPage', '{{ $option }}')"
-                                    type="button"
-                                    class="rounded-full px-4 py-2 text-sm font-semibold transition {{ $userRecordsPerPage === $option ? 'bg-stone-900 text-white' : 'border border-stone-300 bg-white text-stone-700' }}"
-                                >
-                                    {{ $option === 'all' ? 'All' : $option }}
-                                </button>
-                            @endforeach
-                        </span>
-                    </label>
+            <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+                <h2 class="text-xl font-bold text-stone-950 lg:shrink-0">User Accounts</h2>
+                <div class="relative lg:mx-auto lg:w-full lg:max-w-sm">
+                    <svg class="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-stone-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 3.473 9.78l3.124 3.124a.75.75 0 1 0 1.06-1.06l-3.124-3.125A5.5 5.5 0 0 0 9 3.5ZM5 9a4 4 0 1 1 8 0 4 4 0 0 1-8 0Z" clip-rule="evenodd" />
+                    </svg>
+                    <input
+                        type="search"
+                        wire:model.live.debounce.300ms="userSearch"
+                        placeholder="Search by name or email"
+                        class="w-full rounded-full border-stone-300 bg-stone-50 py-2 pl-10 pr-4 text-sm placeholder:text-stone-400 focus:border-stone-400 focus:ring-stone-400"
+                    >
                 </div>
+                <label class="flex items-center gap-3 text-sm text-stone-600 lg:shrink-0">
+                    <span>Show</span>
+                    <span class="inline-flex flex-wrap gap-2">
+                        @foreach ($pageSizeOptions as $option)
+                            <button
+                                wire:click="$set('userRecordsPerPage', '{{ $option }}')"
+                                type="button"
+                                class="rounded-full px-4 py-2 text-sm font-semibold transition {{ $userRecordsPerPage === $option ? 'bg-stone-900 text-white' : 'border border-stone-300 bg-white text-stone-700' }}"
+                            >
+                                {{ $option === 'all' ? 'All' : $option }}
+                            </button>
+                        @endforeach
+                    </span>
+                </label>
             </div>
             <div class="mt-5 grid max-h-[22.5rem] gap-3 overflow-y-auto pr-1 md:grid-cols-2 xl:grid-cols-3">
                 @forelse ($users as $user)
