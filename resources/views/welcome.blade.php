@@ -8,83 +8,91 @@
         <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800&display=swap" rel="stylesheet" />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.15),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(217,119,6,0.18),_transparent_26%),linear-gradient(180deg,_#faf7f2_0%,_#f5efe4_55%,_#efe2ce_100%)] text-stone-900" style="font-family: Manrope, sans-serif;">
-        <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <x-application-logo class="h-12 w-auto max-w-[12rem]" />
-                    <div>
-                        <div class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500">ER Drill</div>
-                        <div class="text-lg font-bold text-stone-900">Management</div>
+    <body class="min-h-screen bg-white text-stone-900" style="font-family: Manrope, sans-serif;">
+
+        {{-- Background decoration --}}
+        <div style="pointer-events: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -10; overflow: hidden;">
+            <div style="position: absolute; top: -160px; right: -160px; width: 600px; height: 600px; border-radius: 9999px; background: radial-gradient(circle, rgba(43,45,138,0.07) 0%, transparent 70%);"></div>
+            <div style="position: absolute; bottom: -160px; left: -160px; width: 500px; height: 500px; border-radius: 9999px; background: radial-gradient(circle, rgba(0,163,200,0.05) 0%, transparent 70%);"></div>
+            <div style="position: absolute; inset: 0; background: linear-gradient(175deg, #F0F3FA 0%, #FFFFFF 45%);"></div>
+        </div>
+
+        {{-- Header --}}
+        <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(43,45,138,0.08);">
+            <div style="max-width: 80rem; margin: 0 auto; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <x-application-logo class="h-10 w-auto max-w-[10rem]" />
+                    <div style="padding-left: 1rem; border-left: 1px solid rgba(43,45,138,0.15);">
+                        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: #2B2D8A;">ER Drill</div>
+                        <div style="font-size: 0.875rem; font-weight: 700; color: #1A1C5E;">Management</div>
                     </div>
                 </div>
-                <a href="{{ route('login') }}" class="rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white shadow-xl shadow-stone-900/15">Sign In</a>
+                <a href="{{ route('login') }}"
+                   style="background: #2B2D8A; box-shadow: 0 4px 14px rgba(43,45,138,0.25); border-radius: 9999px; padding: 0.625rem 1.25rem; font-size: 0.875rem; font-weight: 700; color: white; text-decoration: none;">
+                    Sign In
+                </a>
+            </div>
+        </header>
+
+        {{-- Main: full-height flex column with everything centered as one group --}}
+        <main style="min-height: 100vh; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; padding: 6rem 1.5rem 3rem; text-align: center;">
+
+            {{-- Hero content --}}
+            <div style="max-width: 42rem; width: 100%; margin: 0 auto; text-align: center;">
+
+                    {{-- Eyebrow --}}
+                    <div style="display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 9999px; border: 1px solid rgba(43,45,138,0.2); background: rgba(43,45,138,0.05); padding: 0.375rem 1rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #2B2D8A;">
+                        <span style="width: 0.375rem; height: 0.375rem; border-radius: 9999px; background: #00A3C8; display: inline-block;"></span>
+                        Offshore Emergency Response
+                    </div>
+
+                    {{-- Headline --}}
+                    <h1 style="margin-top: 1.75rem; font-size: clamp(3rem, 6vw, 4rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.08; color: #1A1C5E;">
+                        ER Drill<br>
+                        <span style="color: #2B2D8A;">Management</span>
+                    </h1>
+
+                    {{-- Subtitle --}}
+                    <p style="margin: 1.75rem auto 0; max-width: 38rem; font-size: 1.0625rem; line-height: 1.75; color: #64748b;">
+                        Structured drill governance from STO input through BE verification to OIM approval — with full audit trail and rig-based access control.
+                    </p>
+
+                    {{-- CTA --}}
+                    <div style="margin-top: 2.5rem;">
+                        <a href="{{ route('login') }}"
+                           style="display: inline-flex; align-items: center; gap: 0.625rem; border-radius: 9999px; padding: 1rem 2rem; font-size: 0.875rem; font-weight: 700; color: white; text-decoration: none; background: #2B2D8A; box-shadow: 0 6px 20px rgba(43,45,138,0.3); transition: opacity 0.15s;">
+                            Open Login
+                            <svg style="width: 1rem; height: 1rem;" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
+                        </a>
+                    </div>
+
             </div>
 
-            <section class="mt-16 grid gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-                <div>
-                    <div class="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-900">
-                        <span class="h-2 w-2 rounded-full bg-amber-500"></span>
-                        Drill governance for offshore operations
+            {{-- Feature strip: sits naturally below hero, centered with it --}}
+            <div style="margin: 4rem auto 0; padding-top: 2.5rem; border-top: 1px solid rgba(43,45,138,0.1); max-width: 56rem; width: 100%;">
+                <div style="display: flex; flex-wrap: nowrap;">
+                    <div style="flex: 1; text-align: center; padding: 0 1rem;">
+                        <div style="font-size: 0.625rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #00A3C8;">Workflow</div>
+                        <div style="margin-top: 0.4rem; font-size: 0.8125rem; font-weight: 600; color: #1A1C5E;">STO → BE → OIM</div>
                     </div>
-                    <h1 class="mt-6 max-w-3xl text-5xl font-extrabold tracking-tight text-stone-950 sm:text-6xl">
-                        One system for STO input, BE verification, OIM approval, and rig-wide reporting.
-                    </h1>
-                    <p class="mt-6 max-w-2xl text-lg leading-8 text-stone-700">
-                        ER Drill Management keeps every exercise traceable from draft through closure, with rig-based access, attached evidence, corrective actions, and export-ready reports for leadership.
-                    </p>
-                    <div class="mt-8 flex flex-wrap gap-4">
-                        <a href="{{ route('login') }}" class="rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-stone-900/15">Open Login</a>
+                    <div style="flex: 1; text-align: center; padding: 0 1rem; border-left: 1px solid rgba(43,45,138,0.1);">
+                        <div style="font-size: 0.625rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #00A3C8;">Evidence</div>
+                        <div style="margin-top: 0.4rem; font-size: 0.8125rem; font-weight: 600; color: #1A1C5E;">Photos &amp; Reports</div>
                     </div>
-                </div>
-
-                <div class="rounded-[2rem] border border-white/80 bg-white/85 p-8 shadow-2xl shadow-stone-900/10 backdrop-blur">
-                    <div class="grid gap-5">
-                        <div class="rounded-3xl bg-stone-950 p-6 text-white">
-                            <div class="text-sm font-semibold text-amber-200">Workflow routing</div>
-                            <div class="mt-3 text-2xl font-bold">STO -> BE -> OIM</div>
-                            <p class="mt-2 text-sm leading-6 text-stone-300">Submit, verify, approve, and close with role-specific permissions and audit history.</p>
-                        </div>
-                        <div class="grid gap-5 sm:grid-cols-2">
-                            <div class="rounded-3xl border border-stone-200 bg-stone-50 p-5">
-                                <div class="text-sm font-semibold text-stone-500">Attachments</div>
-                                <div class="mt-2 text-lg font-bold text-stone-900">Photos and reports</div>
-                            </div>
-                            <div class="rounded-3xl border border-stone-200 bg-stone-50 p-5">
-                                <div class="text-sm font-semibold text-stone-500">Notifications</div>
-                                <div class="mt-2 text-lg font-bold text-stone-900">Email at each approval step</div>
-                            </div>
-                            <div class="rounded-3xl border border-stone-200 bg-stone-50 p-5">
-                                <div class="text-sm font-semibold text-stone-500">Exports</div>
-                                <div class="mt-2 text-lg font-bold text-stone-900">Excel and PDF outputs</div>
-                            </div>
-                            <div class="rounded-3xl border border-stone-200 bg-stone-50 p-5">
-                                <div class="text-sm font-semibold text-stone-500">Rig access</div>
-                                <div class="mt-2 text-lg font-bold text-stone-900">Scoped by assignment</div>
-                            </div>
-                        </div>
+                    <div style="flex: 1; text-align: center; padding: 0 1rem; border-left: 1px solid rgba(43,45,138,0.1);">
+                        <div style="font-size: 0.625rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #00A3C8;">Notifications</div>
+                        <div style="margin-top: 0.4rem; font-size: 0.8125rem; font-weight: 600; color: #1A1C5E;">Email at Each Step</div>
+                    </div>
+                    <div style="flex: 1; text-align: center; padding: 0 1rem; border-left: 1px solid rgba(43,45,138,0.1);">
+                        <div style="font-size: 0.625rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #00A3C8;">Exports</div>
+                        <div style="margin-top: 0.4rem; font-size: 0.8125rem; font-weight: 600; color: #1A1C5E;">PDF Reports</div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section id="features" class="mt-20 grid gap-6 md:grid-cols-3">
-                <div class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-lg shadow-stone-900/5">
-                    <div class="text-sm font-semibold uppercase tracking-[0.24em] text-stone-500">Operational</div>
-                    <h2 class="mt-3 text-2xl font-bold text-stone-900">Drill Execution</h2>
-                    <p class="mt-3 text-sm leading-7 text-stone-600">Capture drill details, timeline events, follow-up actions, and supporting files in one structured record.</p>
-                </div>
-                <div class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-lg shadow-stone-900/5">
-                    <div class="text-sm font-semibold uppercase tracking-[0.24em] text-stone-500">Approval</div>
-                    <h2 class="mt-3 text-2xl font-bold text-stone-900">Controlled Review</h2>
-                    <p class="mt-3 text-sm leading-7 text-stone-600">Keep BE and OIM review gates separate with return comments, status tracking, and full workflow history.</p>
-                </div>
-                <div class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-lg shadow-stone-900/5">
-                    <div class="text-sm font-semibold uppercase tracking-[0.24em] text-stone-500">Leadership</div>
-                    <h2 class="mt-3 text-2xl font-bold text-stone-900">Rig Reporting</h2>
-                    <p class="mt-3 text-sm leading-7 text-stone-600">RM and Management get filtered dashboards, overdue action tracking, and export-ready reporting across rigs.</p>
-                </div>
-            </section>
+        </main>
 
-        </div>
     </body>
 </html>

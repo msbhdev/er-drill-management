@@ -7,54 +7,32 @@
 
         <title>{{ config('app.name', 'ER Drill Management') }}</title>
 
-        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased text-stone-900" style="font-family: Manrope, sans-serif;">
-        <div class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(15,118,110,0.2),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(217,119,6,0.18),_transparent_24%),linear-gradient(180deg,_#111827_0%,_#1f2937_100%)] px-4 py-10">
-            <div class="mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1.2fr_0.9fr]">
-                <div class="text-white">
-                    <div class="mb-6 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur">
-                        <span class="h-2 w-2 rounded-full bg-amber-300"></span>
-                        Offshore Emergency Response Workflow
-                    </div>
-                    <h1 class="max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">
-                        Coordinate drills, approvals, and rig reporting from one control room.
-                    </h1>
-                    <p class="mt-5 max-w-xl text-lg leading-8 text-slate-200">
-                        ER Drill Management centralizes STO submissions, BE verification, OIM approval, and cross-rig reporting with traceable audit history.
-                    </p>
-                    <div class="mt-8 grid gap-4 sm:grid-cols-3">
-                        <div class="rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
-                            <div class="text-sm font-semibold text-amber-200">Workflow</div>
-                            <div class="mt-2 text-sm text-slate-200">Draft, verify, approve, and close with comments and email alerts.</div>
-                        </div>
-                        <div class="rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
-                            <div class="text-sm font-semibold text-amber-200">Rig Control</div>
-                            <div class="mt-2 text-sm text-slate-200">Rig-specific access for STO, BE, OIM, and RM with shared role accounts.</div>
-                        </div>
-                        <div class="rounded-3xl border border-white/10 bg-white/10 p-5 backdrop-blur">
-                            <div class="text-sm font-semibold text-amber-200">Reporting</div>
-                            <div class="mt-2 text-sm text-slate-200">Interactive dashboards plus Excel and PDF exports for management.</div>
-                        </div>
-                    </div>
-                </div>
+    <body class="min-h-screen text-stone-900" style="font-family: Manrope, sans-serif; background: white;">
 
-                <div class="w-full rounded-[2rem] border border-white/10 bg-white p-8 shadow-2xl shadow-black/30">
-                    <a href="/" wire:navigate class="mb-8 flex items-center gap-4">
-                        <x-application-logo class="h-14 w-auto max-w-[13rem]" />
-                        <div>
-                            <div class="text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">ER Drill Management</div>
-                            <div class="text-lg font-bold text-stone-900">Sign in to continue</div>
-                        </div>
-                    </a>
+        {{-- Background decoration --}}
+        <div style="pointer-events: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -10; overflow: hidden;">
+            <div style="position: absolute; top: -160px; right: -160px; width: 600px; height: 600px; border-radius: 9999px; background: radial-gradient(circle, rgba(43,45,138,0.07) 0%, transparent 70%);"></div>
+            <div style="position: absolute; bottom: -160px; left: -160px; width: 500px; height: 500px; border-radius: 9999px; background: radial-gradient(circle, rgba(0,163,200,0.05) 0%, transparent 70%);"></div>
+            <div style="position: absolute; inset: 0; background: linear-gradient(175deg, #F0F3FA 0%, #FFFFFF 45%);"></div>
+        </div>
 
-                    {{ $slot }}
-                </div>
+        {{-- Centered login card --}}
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1.5rem;">
+            <div style="max-width: 28rem; width: 100%; margin: 0 auto; background: white; border-radius: 1.5rem; padding: 2.75rem 2.5rem; box-shadow: 0 24px 60px -20px rgba(43,45,138,0.18), 0 2px 8px rgba(43,45,138,0.06); border: 1px solid rgba(43,45,138,0.06);">
+
+                {{-- Logo + title --}}
+                <a href="/" wire:navigate style="display: block; text-align: center; text-decoration: none; margin-bottom: 2rem;">
+                    <x-application-logo class="mx-auto h-12 w-auto max-w-[10rem]" />
+                    <div style="margin-top: 1.25rem; font-size: 10px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: #2B2D8A;">ER Drill Management</div>
+                    <div style="margin-top: 0.5rem; font-size: 1.25rem; font-weight: 700; color: #1A1C5E;">Sign in to continue</div>
+                </a>
+
+                {{ $slot }}
             </div>
         </div>
     </body>
