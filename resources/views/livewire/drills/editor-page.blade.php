@@ -229,70 +229,101 @@
             </section>
         </div>
 
-        <div class="space-y-6 xl:self-start">
-            <section class="rounded-[2rem] border border-stone-900/10 bg-stone-950 p-6 text-white shadow-xl shadow-stone-900/20 xl:sticky xl:top-24">
-                <h2 class="text-xl font-bold">Workflow Actions</h2>
-                <p class="mt-2 text-sm leading-6 text-stone-300">Only the role assigned to the current workflow step can progress or return the record.</p>
+        <div class="xl:self-start" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <section style="position: relative; overflow: hidden; border-radius: 1.75rem; border: 1px solid rgba(43,45,138,0.08); background: white; padding: 1.75rem; box-shadow: 0 12px 40px -16px rgba(43,45,138,0.15), 0 2px 6px rgba(43,45,138,0.04);">
+                {{-- Gem accents matching the dashboard hero --}}
+                <div style="position: absolute; top: -40px; right: -40px; width: 160px; height: 160px; border-radius: 9999px; background: radial-gradient(circle, rgba(0,163,200,0.10) 0%, transparent 70%); pointer-events: none;"></div>
+                <div style="position: absolute; bottom: -60px; left: -40px; width: 140px; height: 140px; border-radius: 9999px; background: radial-gradient(circle, rgba(123,63,184,0.07) 0%, transparent 70%); pointer-events: none;"></div>
 
-                @if ($record)
-                    <div class="mt-4 grid gap-3 text-sm">
-                        <div class="rounded-2xl bg-white/10 p-4">
-                            <div class="text-xs uppercase tracking-[0.2em] text-stone-300">STO Snapshot</div>
-                            <div class="mt-2 font-semibold">{{ $record->sto_name ?: 'Not assigned' }}</div>
-                        </div>
-                        <div class="rounded-2xl bg-white/10 p-4">
-                            <div class="text-xs uppercase tracking-[0.2em] text-stone-300">BE Snapshot</div>
-                            <div class="mt-2 font-semibold">{{ $record->be_name ?: 'Not assigned' }}</div>
-                        </div>
-                        <div class="rounded-2xl bg-white/10 p-4">
-                            <div class="text-xs uppercase tracking-[0.2em] text-stone-300">OIM Snapshot</div>
-                            <div class="mt-2 font-semibold">{{ $record->oim_name ?: 'Not assigned' }}</div>
-                        </div>
+                <div style="position: relative;">
+                    <div style="display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 9999px; border: 1px solid rgba(43,45,138,0.18); background: rgba(43,45,138,0.04); padding: 0.3rem 0.875rem; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #2B2D8A;">
+                        <span style="width: 0.375rem; height: 0.375rem; border-radius: 9999px; background: #00A3C8;"></span>
+                        Workflow
                     </div>
-                @endif
+                    <h2 style="margin-top: 0.875rem; font-size: 1.25rem; font-weight: 800; color: #1A1C5E;">Workflow Actions</h2>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; line-height: 1.65; color: #64748b;">Only the role assigned to the current workflow step can progress or return the record.</p>
 
-                <div class="mt-6 space-y-3">
-                    @if ($editable)
-                        <button wire:click="resetForm" type="button" class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
-                            Reset Form
-                        </button>
-                        <button wire:click="saveDraft" type="button" class="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white">
-                            Save Draft
-                        </button>
-                        <button wire:click="submit" type="button" class="w-full rounded-2xl bg-amber-400 px-4 py-3 text-sm font-semibold text-stone-950">
-                            Submit to BE
-                        </button>
+                    @if ($record)
+                        <div style="margin-top: 1.25rem; display: flex; flex-direction: column; gap: 0.625rem;">
+                            @foreach ([['STO', $record->sto_name], ['BE', $record->be_name], ['OIM', $record->oim_name]] as $snap)
+                                <div style="border-radius: 0.875rem; border: 1px solid rgba(43,45,138,0.08); background: #F7F8FC; padding: 0.875rem 1rem;">
+                                    <div style="font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #2B2D8A;">{{ $snap[0] }} Snapshot</div>
+                                    <div style="margin-top: 0.3rem; font-size: 0.9375rem; font-weight: 700; color: #1A1C5E;">{{ $snap[1] ?: 'Not assigned' }}</div>
+                                </div>
+                            @endforeach
+                        </div>
                     @endif
 
-                    @if ($canVerify)
-                        <button wire:click="verify" type="button" class="w-full rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white">
-                            Verify Drill
-                        </button>
-                        <button wire:click="returnByBe" type="button" class="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white">
-                            Return to STO
-                        </button>
-                    @endif
+                    <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.625rem;">
+                        @if ($editable)
+                            <button wire:click="resetForm" type="button"
+                                    style="width: 100%; border-radius: 0.875rem; border: 1px solid rgba(43,45,138,0.18); background: white; padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 600; color: #475569; cursor: pointer; transition: all 0.15s;"
+                                    onmouseover="this.style.borderColor='#2B2D8A'; this.style.color='#2B2D8A';"
+                                    onmouseout="this.style.borderColor='rgba(43,45,138,0.18)'; this.style.color='#475569';">
+                                Reset Form
+                            </button>
+                            <button wire:click="saveDraft" type="button"
+                                    style="width: 100%; border-radius: 0.875rem; background: rgba(43,45,138,0.08); padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: #2B2D8A; border: none; cursor: pointer; transition: background 0.15s;"
+                                    onmouseover="this.style.background='rgba(43,45,138,0.14)';"
+                                    onmouseout="this.style.background='rgba(43,45,138,0.08)';">
+                                Save Draft
+                            </button>
+                            <button wire:click="submit" type="button"
+                                    style="width: 100%; border-radius: 0.875rem; background: #2B2D8A; padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: white; border: none; cursor: pointer; box-shadow: 0 6px 18px rgba(43,45,138,0.28); transition: opacity 0.15s;"
+                                    onmouseover="this.style.opacity='0.9';"
+                                    onmouseout="this.style.opacity='1';">
+                                Submit to BE
+                            </button>
+                        @endif
 
-                    @if ($canApprove)
-                        <button wire:click="approve" type="button" class="w-full rounded-2xl bg-teal-500 px-4 py-3 text-sm font-semibold text-white">
-                            Approve Drill
-                        </button>
-                        <button wire:click="returnByOim" type="button" class="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white">
-                            Return to STO
-                        </button>
-                    @endif
+                        @if ($canVerify)
+                            <button wire:click="verify" type="button"
+                                    style="width: 100%; border-radius: 0.875rem; background: #00A3C8; padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: white; border: none; cursor: pointer; box-shadow: 0 6px 18px rgba(0,163,200,0.35); transition: opacity 0.15s;"
+                                    onmouseover="this.style.opacity='0.9';"
+                                    onmouseout="this.style.opacity='1';">
+                                Verify Drill
+                            </button>
+                            <button wire:click="returnByBe" type="button"
+                                    style="width: 100%; border-radius: 0.875rem; border: 1px solid rgba(232,118,42,0.4); background: rgba(232,118,42,0.08); padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: #a85416; cursor: pointer; transition: background 0.15s;"
+                                    onmouseover="this.style.background='rgba(232,118,42,0.16)';"
+                                    onmouseout="this.style.background='rgba(232,118,42,0.08)';">
+                                Return to STO
+                            </button>
+                        @endif
 
-                    @if ($canClose)
-                        <button wire:click="closeRecord" type="button" class="w-full rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-stone-950">
-                            Close Drill
-                        </button>
-                    @endif
-                </div>
+                        @if ($canApprove)
+                            <button wire:click="approve" type="button"
+                                    style="width: 100%; border-radius: 0.875rem; background: #7B3FB8; padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: white; border: none; cursor: pointer; box-shadow: 0 6px 18px rgba(123,63,184,0.32); transition: opacity 0.15s;"
+                                    onmouseover="this.style.opacity='0.9';"
+                                    onmouseout="this.style.opacity='1';">
+                                Approve Drill
+                            </button>
+                            <button wire:click="returnByOim" type="button"
+                                    style="width: 100%; border-radius: 0.875rem; border: 1px solid rgba(232,118,42,0.4); background: rgba(232,118,42,0.08); padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: #a85416; cursor: pointer; transition: background 0.15s;"
+                                    onmouseover="this.style.background='rgba(232,118,42,0.16)';"
+                                    onmouseout="this.style.background='rgba(232,118,42,0.08)';">
+                                Return to STO
+                            </button>
+                        @endif
 
-                <div class="mt-6">
-                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-300">Workflow Comments</label>
-                    <textarea wire:model="reviewComments" rows="4" class="mt-2 w-full rounded-2xl border-transparent bg-white/10 text-sm text-white placeholder:text-stone-300"></textarea>
-                    @error('reviewComments') <div class="mt-2 text-sm text-amber-200">{{ $message }}</div> @enderror
+                        @if ($canClose)
+                            <button wire:click="closeRecord" type="button"
+                                    style="width: 100%; border-radius: 0.875rem; background: #047857; padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: white; border: none; cursor: pointer; box-shadow: 0 6px 18px rgba(4,120,87,0.28); transition: opacity 0.15s;"
+                                    onmouseover="this.style.opacity='0.9';"
+                                    onmouseout="this.style.opacity='1';">
+                                Close Drill
+                            </button>
+                        @endif
+                    </div>
+
+                    <div style="margin-top: 1.5rem;">
+                        <label style="display: block; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #2B2D8A; margin-bottom: 0.5rem;">Workflow Comments</label>
+                        <textarea wire:model="reviewComments" rows="4"
+                                  style="width: 100%; border-radius: 0.875rem; border: 1px solid rgba(43,45,138,0.18); background: #F7F8FC; padding: 0.75rem 1rem; font-size: 0.875rem; color: #1A1C5E; box-sizing: border-box; font-family: inherit; resize: vertical;"
+                                  onfocus="this.style.borderColor='#2B2D8A'; this.style.background='white';"
+                                  onblur="this.style.borderColor='rgba(43,45,138,0.18)'; this.style.background='#F7F8FC';"></textarea>
+                        @error('reviewComments') <div style="margin-top: 0.5rem; font-size: 0.8125rem; color: #b45309;">{{ $message }}</div> @enderror
+                    </div>
                 </div>
             </section>
 

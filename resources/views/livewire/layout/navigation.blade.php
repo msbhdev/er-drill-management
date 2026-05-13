@@ -23,84 +23,98 @@ new class extends Component
     }
 }; ?>
 
-<nav x-data="{ open: false }" class="sticky top-0 z-40 border-b border-stone-200/80 bg-white/85 backdrop-blur">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <div class="flex items-center gap-4">
-            <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-4">
+@php
+    $navItems = [
+        ['route' => 'dashboard', 'label' => 'Dashboard', 'pattern' => 'dashboard', 'show' => true],
+        ['route' => 'drills.index', 'label' => 'Drills', 'pattern' => 'drills.*', 'show' => true],
+        ['route' => 'reports.index', 'label' => 'Reports', 'pattern' => 'reports.*', 'show' => in_array(auth()->user()->role, ['RM', 'Management', 'Administrator'], true)],
+        ['route' => 'admin.settings', 'label' => 'Admin', 'pattern' => 'admin.*', 'show' => auth()->user()->role === 'Administrator'],
+    ];
+@endphp
+
+<nav x-data="{ open: false }" style="position: sticky; top: 0; z-index: 40; border-bottom: 1px solid rgba(43,45,138,0.08); background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+    <style>
+        .nav-desktop { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-desktop-actions { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-hamburger { display: none; align-items: center; justify-content: center; border-radius: 9999px; border: 1px solid rgba(43,45,138,0.2); padding: 0.5rem; color: #2B2D8A; background: white; cursor: pointer; }
+        .nav-mobile-drawer { display: none; border-top: 1px solid rgba(43,45,138,0.08); background: white; }
+        .nav-mobile-drawer.is-open { display: block; }
+        @media (max-width: 767px) {
+            .nav-desktop, .nav-desktop-actions { display: none !important; }
+            .nav-hamburger { display: inline-flex !important; }
+        }
+    </style>
+    <div style="max-width: 80rem; margin: 0 auto; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <a href="{{ route('dashboard') }}" wire:navigate style="display: flex; align-items: center; gap: 1rem; text-decoration: none;">
                 <x-application-logo class="h-10 w-auto max-w-[10rem]" />
-                <div>
-                    <div class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500">ER Drill</div>
-                    <div class="text-sm font-bold text-stone-900">Management</div>
+                <div style="padding-left: 1rem; border-left: 1px solid rgba(43,45,138,0.15);">
+                    <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase; color: #2B2D8A;">ER Drill</div>
+                    <div style="font-size: 0.875rem; font-weight: 700; color: #1A1C5E;">Management</div>
                 </div>
             </a>
 
-            <div class="hidden items-center gap-2 md:flex">
-                <a href="{{ route('dashboard') }}" wire:navigate class="{{ request()->routeIs('dashboard') ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-100' }} rounded-full px-4 py-2 text-sm font-semibold">
-                    Dashboard
-                </a>
-                <a href="{{ route('drills.index') }}" wire:navigate class="{{ request()->routeIs('drills.*') ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-100' }} rounded-full px-4 py-2 text-sm font-semibold">
-                    Drills
-                </a>
-                @if (in_array(auth()->user()->role, ['RM', 'Management', 'Administrator'], true))
-                    <a href="{{ route('reports.index') }}" wire:navigate class="{{ request()->routeIs('reports.*') ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-100' }} rounded-full px-4 py-2 text-sm font-semibold">
-                        Reports
-                    </a>
-                @endif
-                @if (auth()->user()->role === 'Administrator')
-                    <a href="{{ route('admin.settings') }}" wire:navigate class="{{ request()->routeIs('admin.*') ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-100' }} rounded-full px-4 py-2 text-sm font-semibold">
-                        Admin
-                    </a>
-                @endif
+            <div class="nav-desktop">
+                @foreach ($navItems as $item)
+                    @if ($item['show'])
+                        @php $active = request()->routeIs($item['pattern']); @endphp
+                        <a href="{{ route($item['route']) }}" wire:navigate
+                           style="border-radius: 9999px; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: all 0.15s; {{ $active ? 'background: #2B2D8A; color: white; box-shadow: 0 4px 14px rgba(43,45,138,0.25);' : 'color: #475569; background: transparent;' }}"
+                           @if (! $active)
+                               onmouseover="this.style.background='rgba(43,45,138,0.06)'; this.style.color='#2B2D8A';"
+                               onmouseout="this.style.background='transparent'; this.style.color='#475569';"
+                           @endif >
+                            {{ $item['label'] }}
+                        </a>
+                    @endif
+                @endforeach
             </div>
         </div>
 
-        <div class="hidden items-center gap-3 md:flex">
-            <div class="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-2 text-right">
-                <div class="text-sm font-bold text-stone-900">{{ auth()->user()->full_name }}</div>
-                <div class="text-xs uppercase tracking-[0.24em] text-stone-500">
+        <div class="nav-desktop-actions">
+            <div style="border-radius: 1rem; border: 1px solid rgba(43,45,138,0.1); background: #F7F8FC; padding: 0.5rem 1rem; text-align: right;">
+                <div style="font-size: 0.875rem; font-weight: 700; color: #1A1C5E;">{{ auth()->user()->full_name }}</div>
+                <div style="font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase; color: #2B2D8A; font-weight: 600;">
                     {{ auth()->user()->role }} @if (auth()->user()->rig) · {{ auth()->user()->rig->code }} @endif
                 </div>
             </div>
 
-            <a href="{{ route('profile') }}" wire:navigate class="rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-stone-900/10">
+            <a href="{{ route('profile') }}" wire:navigate
+               style="border-radius: 9999px; background: #2B2D8A; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; color: white; text-decoration: none; box-shadow: 0 4px 14px rgba(43,45,138,0.25);">
                 Profile
             </a>
 
-            <button wire:click="logout" class="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 transition hover:border-stone-900 hover:text-stone-900">
+            <button wire:click="logout"
+                    style="border-radius: 9999px; border: 1px solid rgba(43,45,138,0.2); background: white; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; color: #475569; cursor: pointer; transition: all 0.15s;"
+                    onmouseover="this.style.borderColor='#2B2D8A'; this.style.color='#2B2D8A';"
+                    onmouseout="this.style.borderColor='rgba(43,45,138,0.2)'; this.style.color='#475569';">
                 Log Out
             </button>
         </div>
 
-        <button @click="open = ! open" class="inline-flex items-center justify-center rounded-full border border-stone-300 p-2 text-stone-700 md:hidden">
-            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+        <button @click="open = ! open" class="nav-hamburger">
+            <svg style="width: 1.5rem; height: 1.5rem;" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                 <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
     </div>
 
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden border-t border-stone-200 bg-white md:hidden">
-        <div class="space-y-2 px-4 py-4">
-            <a href="{{ route('dashboard') }}" wire:navigate class="block rounded-2xl px-4 py-3 text-sm font-semibold {{ request()->routeIs('dashboard') ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-800' }}">
-                Dashboard
-            </a>
-            <a href="{{ route('drills.index') }}" wire:navigate class="block rounded-2xl px-4 py-3 text-sm font-semibold {{ request()->routeIs('drills.*') ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-800' }}">
-                Drills
-            </a>
-            @if (in_array(auth()->user()->role, ['RM', 'Management', 'Administrator'], true))
-                <a href="{{ route('reports.index') }}" wire:navigate class="block rounded-2xl px-4 py-3 text-sm font-semibold {{ request()->routeIs('reports.*') ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-800' }}">
-                    Reports
-                </a>
-            @endif
-            @if (auth()->user()->role === 'Administrator')
-                <a href="{{ route('admin.settings') }}" wire:navigate class="block rounded-2xl px-4 py-3 text-sm font-semibold {{ request()->routeIs('admin.*') ? 'bg-stone-900 text-white' : 'bg-stone-100 text-stone-800' }}">
-                    Admin
-                </a>
-            @endif
-            <a href="{{ route('profile') }}" wire:navigate class="block rounded-2xl bg-stone-100 px-4 py-3 text-sm font-semibold text-stone-800">
+    <div :class="{ 'is-open': open }" class="nav-mobile-drawer">
+        <div style="padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            @foreach ($navItems as $item)
+                @if ($item['show'])
+                    @php $active = request()->routeIs($item['pattern']); @endphp
+                    <a href="{{ route($item['route']) }}" wire:navigate
+                       style="display: block; border-radius: 0.875rem; padding: 0.75rem 1rem; font-size: 0.875rem; font-weight: 600; text-decoration: none; {{ $active ? 'background: #2B2D8A; color: white;' : 'background: #F7F8FC; color: #1A1C5E;' }}">
+                        {{ $item['label'] }}
+                    </a>
+                @endif
+            @endforeach
+            <a href="{{ route('profile') }}" wire:navigate style="display: block; border-radius: 0.875rem; background: #F7F8FC; padding: 0.75rem 1rem; font-size: 0.875rem; font-weight: 600; color: #1A1C5E; text-decoration: none;">
                 Profile
             </a>
-            <button wire:click="logout" class="block w-full rounded-2xl border border-stone-300 px-4 py-3 text-left text-sm font-semibold text-stone-700">
+            <button wire:click="logout" style="display: block; width: 100%; border-radius: 0.875rem; border: 1px solid rgba(43,45,138,0.2); background: white; padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #475569; cursor: pointer;">
                 Log Out
             </button>
         </div>

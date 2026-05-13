@@ -14,24 +14,30 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-stone-950 text-stone-900" style="font-family: Manrope, sans-serif;">
-        <div class="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.18),_transparent_25%),linear-gradient(180deg,_#faf7f2_0%,_#f5efe4_45%,_#efe4d2_100%)]">
+    <body class="font-sans antialiased text-slate-900" style="font-family: Manrope, sans-serif; background: white;">
+
+        {{-- Background decoration --}}
+        <div style="pointer-events: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -10; overflow: hidden;">
+            <div style="position: absolute; top: -180px; right: -180px; width: 640px; height: 640px; border-radius: 9999px; background: radial-gradient(circle, rgba(43,45,138,0.06) 0%, transparent 70%);"></div>
+            <div style="position: absolute; bottom: -200px; left: -200px; width: 560px; height: 560px; border-radius: 9999px; background: radial-gradient(circle, rgba(0,163,200,0.05) 0%, transparent 70%);"></div>
+            <div style="position: absolute; inset: 0; background: linear-gradient(175deg, #F0F3FA 0%, #FFFFFF 55%);"></div>
+        </div>
+
+        <div style="min-height: 100vh;">
             <livewire:layout.navigation />
             <livewire:profile.name-confirmation-modal />
 
-            <!-- Page Heading -->
             @if (isset($header))
-                <header class="border-b border-stone-200/80 bg-white/70 backdrop-blur">
-                    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <header style="border-bottom: 1px solid rgba(43,45,138,0.08); background: rgba(255,255,255,0.7); backdrop-filter: blur(8px);">
+                    <div style="max-width: 80rem; margin: 0 auto; padding: 1.5rem;">
                         {{ $header }}
                     </div>
                 </header>
             @endif
 
-            <!-- Page Content -->
-            <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <main style="max-width: 80rem; margin: 0 auto; padding: 2rem 1.5rem;">
                 @if (session('status'))
-                    <div class="mb-6 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900 shadow-sm">
+                    <div style="margin-bottom: 1.5rem; border-radius: 1rem; border: 1px solid rgba(0,163,200,0.3); background: rgba(0,163,200,0.08); padding: 0.875rem 1rem; font-size: 0.875rem; font-weight: 500; color: #0a6f87;">
                         {{ session('status') }}
                     </div>
                 @endif
