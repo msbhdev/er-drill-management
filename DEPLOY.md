@@ -188,6 +188,61 @@ sudo -u deploy php artisan view:cache
 > sudo -u deploy php artisan db:seed --force
 > ```
 
+### 3.5 Outbound mail (Microsoft 365 SMTP)
+
+Drill workflow notifications (submit / verify / approve) go through SMTP. With Microsoft 365 the working config is:
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.office365.com
+MAIL_PORT=587
+MAIL_ENCRYPTION=tls
+MAIL_USERNAME=<service-account-upn>
+MAIL_PASSWORD='<password>'          # single quotes — see warning below
+MAIL_FROM_ADDRESS=<same as username, OR a mailbox the account has SendAs on>
+MAIL_FROM_NAME="ER Drill Management"
+```
+
+**Gotchas, in order of how-often-they-bite:**
+
+1. **`$` in the password.** Laravel's dotenv parser expands `$VAR` references inside double-quoted values. Wrap any password with a `$` in **single quotes** (`MAIL_PASSWORD='abc$def'`) — otherwise everything after the `$` silently becomes empty.
+2. **SMTP AUTH disabled by default in M365.** Microsoft 365 admin centre → Users → the service account → *Mail* tab → *Manage email apps* → enable **Authenticated SMTP**. Or in PowerShell: `Set-CASMailbox -Identity <upn> -SmtpClientAuthenticationDisabled $false`. Tenants with org-wide SMTP AUTH disabled still allow per-mailbox overrides.
+3. **MFA on the service account.** If MFA is enforced, basic SMTP AUTH won't work. Either generate an **app password** for the account, or have your M365 admin exclude this service account from MFA via a Conditional Access policy.
+4. **`MAIL_FROM_ADDRESS` must match the authenticated mailbox**, or the account must have explicit *Send As* permission on whatever address is in `MAIL_FROM_ADDRESS`. Mismatch returns `550 5.7.60 Client does not have permissions to send as this sender`.
+5. **Display name override.** M365 substitutes the recipient-visible *from* display name with the mailbox's Entra ID display name when sender and recipient are in the same tenant (or when recipient's mail client does directory lookup). `MAIL_FROM_NAME` is therefore advisory — change the mailbox's display name in M365 admin if you need a specific brand.
+
+After updating `.env`, **always** run:
+```bash
+sudo -u deploy php artisan config:cache
+sudo systemctl restart er-drill-queue.service     # worker re-reads config
+```
+
+Smoke test:
+```bash
+cd /var/www/er-drill
+sudo -u deploy php artisan tinker --execute='
+Mail::raw("SMTP test " . now(), fn($m) => $m->to("you@example.com")->subject("SMTP test"));
+'
+```
+
+### 3.6 UAT mail redirect (optional)
+
+During internal testing the seeded role accounts (`oim.alliance@…`, `bargeengr.alliance@…`, etc.) are often placeholders that no one monitors. To route **every** outbound message to a known inbox for the duration of UAT, set:
+
+```dotenv
+MAIL_REDIRECT_ALL_TO=alice@example.com,bob@example.com
+```
+
+The listener (in `App\Providers\AppServiceProvider::boot()`, gated on `config('mail.redirect_all_to')`) does the following on every outbound message:
+
+- Rewrites `To` to the configured addresses; drops `CC` and `BCC`
+- Prefixes the subject with `[UAT]`
+- Prepends a banner to the HTML/text body showing the original recipient(s)
+
+Leave the env var unset (or empty) in production — the listener is only registered when a value is present.
+
+> **`env()` outside config files returns `null` after `php artisan config:cache`.** The redirect (and the trusted-proxy setup in `bootstrap/app.php`) read their values via `config()` for this reason. If you add new env-driven knobs in a service provider or in `bootstrap/app.php`, expose them through a `config/*.php` file first — never call `env()` directly from those places.
+
 ---
 
 ## 4. Nginx vhost
@@ -364,3 +419,6 @@ sudo -u deploy php artisan up
 | Seeder logs "User list workbook not found" | `UserList.xlsx` not at `ER_DRILL_USER_LIST_PATH` | Place the workbook, re-run `db:seed` |
 | `419 Page Expired` on form submission | `SESSION_SECURE_COOKIE=true` set but request arriving as HTTP | Add proxy IP to `bootstrap/app.php`, or set `SESSION_SECURE_COOKIE=false` if intentionally serving over HTTP |
 | Queue worker eats memory over time | Long-running PHP process | Already mitigated by `--max-time=3600`; systemd `Restart=always` cycles it |
+| SMTP `535 5.7.139 Authentication unsuccessful` | SMTP AUTH disabled on the M365 mailbox, MFA in the way, **or** `$` in password got expanded by dotenv | Enable SMTP AUTH on the mailbox; use an app password if MFA on; wrap the password in single quotes in `.env` |
+| SMTP `550 5.7.60 Client does not have permissions to send as this sender` | `MAIL_FROM_ADDRESS` doesn't match the authenticated mailbox | Match `MAIL_FROM_ADDRESS` to `MAIL_USERNAME`, or grant *Send As* on the desired alias |
+| `MAIL_REDIRECT_ALL_TO` or other env-driven knob in a service provider has no effect | `env()` returns `null` after `config:cache` | Expose the value via a `config/*.php` file and read via `config()` |
