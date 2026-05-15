@@ -37,8 +37,8 @@ class AppServiceProvider extends ServiceProvider
                     ->implode(', ');
                 $email->subject('[UAT] ' . $email->getSubject());
                 $email->to(...array_map(fn ($r) => new Address($r), $recipients));
-                $email->cc([]);
-                $email->bcc([]);
+                $email->cc(...[]);
+                $email->bcc(...[]);
                 if ($original) {
                     $html = $email->getHtmlBody();
                     $banner = '<div style="background:#fff7e8;border:1px solid #f0b15c;padding:8px 12px;'
