@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(DrillRecord::class, DrillRecordPolicy::class);
 
-        $redirect = env('MAIL_REDIRECT_ALL_TO');
+        $redirect = config('mail.redirect_all_to');
         if ($redirect) {
             $recipients = array_values(array_filter(array_map('trim', explode(',', $redirect))));
             Event::listen(function (MessageSending $event) use ($recipients) {

@@ -16,6 +16,8 @@ return [
 
     'default' => env('MAIL_MAILER', 'log'),
 
+    'redirect_all_to' => env('MAIL_REDIRECT_ALL_TO'),
+
     /*
     |--------------------------------------------------------------------------
     | Mailer Configurations
