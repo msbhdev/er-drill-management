@@ -1,13 +1,37 @@
 @php($pageSizeOptions = ['5', '10', '30', '50', 'all'])
+@php($tabs = [
+    'users' => 'Users',
+    'rigs' => 'Rigs',
+    'drill-types' => 'Drill Types',
+    'event-types' => 'Event Types',
+    'dsha' => 'DSHA',
+    'statuses' => 'Statuses',
+])
 
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ tab: 'users' }">
     <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
         <div class="text-sm font-semibold uppercase tracking-[0.24em] text-stone-500">Administration</div>
         <h1 class="mt-2 text-3xl font-extrabold text-stone-950">System Setup</h1>
         <p class="mt-2 max-w-3xl text-sm text-stone-600">Manage users, rigs, drill types, event types, and configurable status lists from one admin console.</p>
     </section>
 
-    <div class="space-y-6">
+    <div class="sticky top-4 z-10 rounded-full border border-white/80 bg-white/85 p-1.5 shadow-xl shadow-stone-900/5 backdrop-blur">
+        <nav class="flex flex-wrap gap-1.5" aria-label="Admin sections">
+            @foreach ($tabs as $key => $label)
+                <button
+                    type="button"
+                    @click="tab = '{{ $key }}'"
+                    :class="tab === '{{ $key }}' ? 'bg-stone-900 text-white shadow' : 'text-stone-600 hover:bg-stone-100'"
+                    class="flex-1 rounded-full px-4 py-2.5 text-sm font-semibold transition"
+                >
+                    {{ $label }}
+                </button>
+            @endforeach
+        </nav>
+    </div>
+
+    {{-- Users --}}
+    <div x-show="tab === 'users'" x-cloak class="space-y-6">
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
             <h2 class="text-xl font-bold text-stone-950">{{ $editingUserId ? 'Edit Shared Account' : 'Create Shared Account' }}</h2>
             <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -152,7 +176,8 @@
         </section>
     </div>
 
-    <div class="grid gap-6 xl:grid-cols-2">
+    {{-- Rigs --}}
+    <div x-show="tab === 'rigs'" x-cloak>
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 class="text-xl font-bold text-stone-950">{{ $editingRigId ? 'Edit Rig' : 'Rigs' }}</h2>
@@ -208,7 +233,10 @@
                 {{ $rigs->links() }}
             </div>
         </section>
+    </div>
 
+    {{-- Drill Types --}}
+    <div x-show="tab === 'drill-types'" x-cloak>
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 class="text-xl font-bold text-stone-950">{{ $editingDrillTypeId ? 'Edit Drill Type' : 'Drill Types' }}</h2>
@@ -260,7 +288,10 @@
                 {{ $drillTypes->links() }}
             </div>
         </section>
+    </div>
 
+    {{-- Event Types --}}
+    <div x-show="tab === 'event-types'" x-cloak>
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 class="text-xl font-bold text-stone-950">{{ $editingEventTypeId ? 'Edit Event Type' : 'Event Types' }}</h2>
@@ -312,7 +343,10 @@
                 {{ $eventTypes->links() }}
             </div>
         </section>
+    </div>
 
+    {{-- DSHA --}}
+    <div x-show="tab === 'dsha'" x-cloak>
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 class="text-xl font-bold text-stone-950">{{ $editingDshaId ? 'Edit DSHA' : 'DSHA (Hazards)' }}</h2>
@@ -368,10 +402,13 @@
                 {{ $dshas->links() }}
             </div>
         </section>
+    </div>
 
+    {{-- Statuses --}}
+    <div x-show="tab === 'statuses'" x-cloak>
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
             <h2 class="text-xl font-bold text-stone-950">Configurable Statuses</h2>
-            <div class="grid gap-6 lg:grid-cols-2">
+            <div class="mt-5 grid gap-6 lg:grid-cols-2">
                 <div>
                     <div class="grid gap-3">
                         <input wire:model="drillStatusName" type="text" placeholder="Drill status name" class="rounded-2xl border-stone-300 bg-stone-50 text-sm">
