@@ -4,10 +4,12 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Livewire\Drills\EditorPage;
+use App\Models\ActionStatus;
+use App\Models\DrillAction;
 use App\Models\DrillAttachment;
 use App\Models\DrillRecord;
-use App\Models\DrillStatus;
 use App\Models\DrillType;
+use App\Models\Dsha;
 use App\Models\EventType;
 use App\Models\Rig;
 use App\Models\User;
@@ -35,7 +37,7 @@ class DrillWorkflowTest extends TestCase
 
         $service = app(DrillWorkflowService::class);
 
-        $record = $service->saveDraft(new DrillRecord(), [
+        $record = $service->saveDraft(new DrillRecord, [
             'rig_id' => $rig->id,
             'drill_type_id' => $drillType->id,
             'event_type_id' => $eventType->id,
@@ -77,7 +79,7 @@ class DrillWorkflowTest extends TestCase
         Livewire::test(EditorPage::class)
             ->set('rigId', $rig->id)
             ->set('drillTypeIds', [$drillType->id])
-            ->set('eventTypeIds', [$eventType->id])
+            ->set('eventTypeId', $eventType->id)
             ->call('addNewAttachment')
             ->set('newAttachments.0', UploadedFile::fake()->image('vantris-logo.png')->size(512))
             ->set('newAttachmentCaptions.0', 'Updated Vantris logo')
@@ -103,7 +105,7 @@ class DrillWorkflowTest extends TestCase
         Livewire::test(EditorPage::class)
             ->set('rigId', $rig->id)
             ->set('drillTypeIds', [$drillType->id])
-            ->set('eventTypeIds', [$eventType->id])
+            ->set('eventTypeId', $eventType->id)
             ->call('addNewAttachment')
             ->set('newAttachments.0', UploadedFile::fake()->create('checklist.pdf', 200, 'application/pdf'))
             ->set('newAttachmentCaptions.0', 'Checklist')
@@ -122,7 +124,7 @@ class DrillWorkflowTest extends TestCase
         Livewire::test(EditorPage::class)
             ->set('rigId', $rig->id)
             ->set('drillTypeIds', [$drillType->id])
-            ->set('eventTypeIds', [$eventType->id])
+            ->set('eventTypeId', $eventType->id)
             ->call('addNewAttachment')
             ->set('newAttachments.0', UploadedFile::fake()->image('oversized.png')->size(1600))
             ->set('newAttachmentCaptions.0', 'Oversized image')
@@ -130,7 +132,7 @@ class DrillWorkflowTest extends TestCase
             ->assertHasErrors(['newAttachments.0' => 'max']);
     }
 
-    public function test_sto_can_assign_multiple_drill_and_event_types(): void
+    public function test_sto_can_assign_multiple_drill_types_and_single_event_type(): void
     {
         $rig = Rig::factory()->create();
         $sto = User::factory()->create(['role' => UserRole::STO->value, 'rig_id' => $rig->id]);
@@ -138,26 +140,45 @@ class DrillWorkflowTest extends TestCase
             DrillType::query()->create(['name' => 'Fire Drill', 'is_active' => true]),
             DrillType::query()->create(['name' => 'Abandon Rig', 'is_active' => true]),
         ]);
-        $eventTypes = collect([
-            EventType::query()->create(['name' => 'Fire', 'is_active' => true]),
-            EventType::query()->create(['name' => 'Explosion', 'is_active' => true]),
-        ]);
+        $eventType = EventType::query()->create(['name' => 'Explosion', 'is_active' => true]);
 
         $this->actingAs($sto);
 
         Livewire::test(EditorPage::class)
             ->set('rigId', $rig->id)
             ->set('drillTypeIds', $drillTypes->pluck('id')->all())
-            ->set('eventTypeIds', $eventTypes->pluck('id')->all())
+            ->set('eventTypeId', $eventType->id)
             ->call('saveDraft')
             ->assertHasNoErrors();
 
         $record = DrillRecord::query()->with(['drillTypes', 'eventTypes'])->firstOrFail();
 
         $this->assertSame($drillTypes->first()->id, $record->drill_type_id);
-        $this->assertSame($eventTypes->first()->id, $record->event_type_id);
+        $this->assertSame($eventType->id, $record->event_type_id);
         $this->assertEqualsCanonicalizing($drillTypes->pluck('id')->all(), $record->drillTypes->pluck('id')->all());
-        $this->assertEqualsCanonicalizing($eventTypes->pluck('id')->all(), $record->eventTypes->pluck('id')->all());
+        $this->assertEqualsCanonicalizing([$eventType->id], $record->eventTypes->pluck('id')->all());
+    }
+
+    public function test_sto_can_assign_multiple_dshas(): void
+    {
+        [$rig, $sto, $drillType, $eventType] = $this->drillFormContext();
+        $dshas = Dsha::query()->orderBy('code')->take(2)->get();
+
+        $this->assertCount(2, $dshas);
+
+        $this->actingAs($sto);
+
+        Livewire::test(EditorPage::class)
+            ->set('rigId', $rig->id)
+            ->set('drillTypeIds', [$drillType->id])
+            ->set('eventTypeId', $eventType->id)
+            ->set('applicableDshaIds', $dshas->pluck('id')->all())
+            ->call('saveDraft')
+            ->assertHasNoErrors();
+
+        $record = DrillRecord::query()->with('dshas')->firstOrFail();
+
+        $this->assertEqualsCanonicalizing($dshas->pluck('id')->all(), $record->dshas->pluck('id')->all());
     }
 
     public function test_approved_drill_cannot_be_saved_back_to_draft(): void
@@ -203,6 +224,44 @@ class DrillWorkflowTest extends TestCase
             'event_type_ids' => $record->eventTypes()->pluck('event_types.id')->all(),
             'drill_date' => $record->drill_date->toDateString(),
         ], $admin);
+    }
+
+    public function test_drill_cannot_be_closed_with_open_follow_up_actions(): void
+    {
+        $record = $this->approvedDrill();
+        $openStatus = ActionStatus::query()->where('code', 'open')->firstOrFail();
+
+        DrillAction::query()->create([
+            'drill_record_id' => $record->id,
+            'action_description' => 'Replace expired extinguisher',
+            'action_owner' => 'STO',
+            'action_status_id' => $openStatus->id,
+            'due_date' => now()->subDay()->toDateString(),
+            'created_by_user_id' => $record->created_by_user_id,
+        ]);
+
+        $this->expectException(AuthorizationException::class);
+
+        app(DrillWorkflowService::class)->close($record->fresh('status'), $record->oimUser, null);
+    }
+
+    public function test_drill_can_be_closed_when_all_actions_are_closed(): void
+    {
+        $record = $this->approvedDrill();
+        $closedStatus = ActionStatus::query()->where('code', 'closed')->firstOrFail();
+
+        DrillAction::query()->create([
+            'drill_record_id' => $record->id,
+            'action_description' => 'Replace expired extinguisher',
+            'action_owner' => 'STO',
+            'action_status_id' => $closedStatus->id,
+            'due_date' => now()->subDay()->toDateString(),
+            'created_by_user_id' => $record->created_by_user_id,
+        ]);
+
+        $closed = app(DrillWorkflowService::class)->close($record->fresh('status'), $record->oimUser, null);
+
+        $this->assertSame('closed', $closed->status->code);
     }
 
     public function test_drill_pdf_download_works_for_visible_record(): void
@@ -334,7 +393,7 @@ class DrillWorkflowTest extends TestCase
         $eventType = EventType::query()->create(['name' => 'Fire '.uniqid(), 'is_active' => true]);
         $service = app(DrillWorkflowService::class);
 
-        $record = $service->saveDraft(new DrillRecord(), [
+        $record = $service->saveDraft(new DrillRecord, [
             'rig_id' => $rig->id,
             'drill_type_id' => $drillType->id,
             'event_type_id' => $eventType->id,

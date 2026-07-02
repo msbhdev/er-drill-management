@@ -30,7 +30,7 @@ class DrillWorkflowService
 
             $status = $fromStatus ?? DrillStatus::query()->where('code', 'draft')->firstOrFail();
 
-            $drillRecord->fill(Arr::except($payload, ['drill_type_ids', 'event_type_ids']));
+            $drillRecord->fill(Arr::except($payload, ['drill_type_ids', 'event_type_ids', 'dsha_ids']));
             $drillRecord->status()->associate($status);
             $drillRecord->reference_no ??= $this->generateReference($payload['rig_id'] ?? $actor->rig_id);
             $drillRecord->created_by_user_id ??= $actor->id;
@@ -73,6 +73,10 @@ class DrillWorkflowService
 
     public function close(DrillRecord $drillRecord, User $actor, ?string $comments): DrillRecord
     {
+        if ($drillRecord->hasOpenActions()) {
+            throw new AuthorizationException('All follow-up actions must be closed before this drill can be closed.');
+        }
+
         return $this->transition($drillRecord, DrillWorkflowAction::Close, 'closed', $actor, $comments, $comments);
     }
 
@@ -122,6 +126,10 @@ class DrillWorkflowService
 
         $drillRecord->drillTypes()->sync($drillTypeIds);
         $drillRecord->eventTypes()->sync($eventTypeIds);
+
+        if (array_key_exists('dsha_ids', $payload)) {
+            $drillRecord->dshas()->sync(array_values(array_filter($payload['dsha_ids'])));
+        }
     }
 
     private function recordHistory(
@@ -175,7 +183,7 @@ class DrillWorkflowService
         $prefix = 'DRILL';
 
         if ($rigId) {
-            $rigCode = optional(\App\Models\Rig::find($rigId))->code;
+            $rigCode = optional(Rig::find($rigId))->code;
             $prefix = $rigCode ?: $prefix;
         }
 

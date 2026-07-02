@@ -20,9 +20,8 @@ class DatabaseSeeder extends Seeder
         }
 
         foreach ([
-            ['name' => 'Fire', 'description' => 'Fire or smoke related event'],
-            ['name' => 'Gas Release', 'description' => 'Gas detection and response event'],
-            ['name' => 'Man Overboard', 'description' => 'Marine rescue event'],
+            ['name' => 'Drill', 'description' => 'Planned drill exercise'],
+            ['name' => 'Real Event', 'description' => 'Actual emergency event'],
         ] as $type) {
             EventType::query()->firstOrCreate(['name' => $type['name']], $type);
         }

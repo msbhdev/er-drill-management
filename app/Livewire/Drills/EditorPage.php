@@ -7,10 +7,11 @@ use App\Models\DrillAction;
 use App\Models\DrillAttachment;
 use App\Models\DrillEvent;
 use App\Models\DrillRecord;
-use App\Models\DrillStatus;
 use App\Models\DrillType;
+use App\Models\Dsha;
 use App\Models\EventType;
 use App\Models\Rig;
+use App\Models\User;
 use App\Services\DrillWorkflowService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
@@ -26,26 +27,47 @@ class EditorPage extends Component
     public ?DrillRecord $drillRecord = null;
 
     public ?int $rigId = null;
+
     public array $drillTypeIds = [];
-    public array $eventTypeIds = [];
+
+    public ?int $eventTypeId = null;
+
     public ?int $statusId = null;
+
     public ?string $drillDate = null;
+
     public ?string $drillTime = null;
+
     public ?string $onDutyCrews = null;
+
     public ?string $eventLocation = null;
+
     public ?string $scenario = null;
-    public ?string $applicableDsha = null;
+
+    public array $applicableDshaIds = [];
+
     public ?string $performanceStandard = null;
+
     public ?string $performanceStandardsMet = null;
+
     public ?string $objectives = null;
+
     public ?string $debriefAttendees = null;
+
     public ?string $positiveObservations = null;
+
     public ?string $improvementOpportunities = null;
+
     public ?string $otherComments = null;
+
     public array $events = [];
+
     public array $actions = [];
+
     public array $newAttachments = [];
+
     public array $newAttachmentCaptions = [];
+
     public ?string $reviewComments = null;
 
     public function mount(?DrillRecord $drillRecord = null): void
@@ -53,7 +75,7 @@ class EditorPage extends Component
         $user = auth()->user();
 
         if ($drillRecord?->exists) {
-            $drillRecord->load(['events', 'actions.status', 'attachments', 'status', 'drillTypes', 'eventTypes', 'workflowHistory.actor', 'workflowHistory.fromStatus', 'workflowHistory.toStatus']);
+            $drillRecord->load(['events', 'actions.status', 'attachments', 'status', 'drillTypes', 'eventTypes', 'dshas', 'workflowHistory.actor', 'workflowHistory.fromStatus', 'workflowHistory.toStatus']);
             $this->authorize('view', $drillRecord);
             $this->drillRecord = $drillRecord;
             $this->fillFromModel($drillRecord);
@@ -131,13 +153,13 @@ class EditorPage extends Component
         abort_unless($this->drillRecord ? $this->drillRecord->isEditableBy(auth()->user()) : Gate::allows('create', DrillRecord::class), 403);
 
         $this->drillTypeIds = [];
-        $this->eventTypeIds = [];
+        $this->eventTypeId = null;
         $this->drillDate = null;
         $this->drillTime = null;
         $this->onDutyCrews = null;
         $this->eventLocation = null;
         $this->scenario = null;
-        $this->applicableDsha = null;
+        $this->applicableDshaIds = [];
         $this->performanceStandard = null;
         $this->performanceStandardsMet = null;
         $this->objectives = null;
@@ -221,6 +243,13 @@ class EditorPage extends Component
     {
         abort_unless($this->drillRecord, 404);
         $this->authorize('close', $this->drillRecord);
+
+        if ($this->drillRecord->hasOpenActions()) {
+            session()->flash('status', 'All follow-up actions must be marked Closed before this drill can be closed.');
+
+            return;
+        }
+
         $workflowService->close($this->drillRecord, auth()->user(), $this->reviewComments);
 
         session()->flash('status', 'Drill has been closed.');
@@ -232,6 +261,17 @@ class EditorPage extends Component
         $user = auth()->user();
         $editable = $this->drillRecord ? $this->drillRecord->fresh('status')?->isEditableBy($user) : Gate::allows('create', DrillRecord::class);
 
+        $rigCode = $this->rigId ? Rig::query()->whereKey($this->rigId)->value('code') : null;
+        $actionOwners = $rigCode
+            ? User::query()
+                ->withAppAccess(config('er_drill.auth_app_code'))
+                ->where('rig_code', $rigCode)
+                ->where('active_status', true)
+                ->orderBy('full_name')
+                ->pluck('full_name')
+                ->all()
+            : [];
+
         return view('livewire.drills.editor-page', [
             'record' => $this->drillRecord?->fresh([
                 'rig',
@@ -239,6 +279,7 @@ class EditorPage extends Component
                 'eventType',
                 'drillTypes',
                 'eventTypes',
+                'dshas',
                 'status',
                 'attachments',
                 'workflowHistory.actor',
@@ -250,11 +291,14 @@ class EditorPage extends Component
                 : Rig::query()->whereKey($user->rig_id)->get(),
             'drillTypes' => DrillType::query()->where('is_active', true)->orderBy('name')->get(),
             'eventTypes' => EventType::query()->where('is_active', true)->orderBy('name')->get(),
+            'dshas' => Dsha::query()->where('is_active', true)->orderBy('code')->get(),
             'actionStatuses' => ActionStatus::query()->where('is_active', true)->orderBy('sort_order')->get(),
+            'actionOwners' => $actionOwners,
             'editable' => $editable,
             'canVerify' => $this->drillRecord ? Gate::allows('verify', $this->drillRecord) : false,
             'canApprove' => $this->drillRecord ? Gate::allows('approve', $this->drillRecord) : false,
             'canClose' => $this->drillRecord ? Gate::allows('close', $this->drillRecord) : false,
+            'hasOpenActions' => $this->drillRecord ? $this->drillRecord->hasOpenActions() : false,
         ])->layout('layouts.app');
     }
 
@@ -264,14 +308,14 @@ class EditorPage extends Component
             'rigId' => ['required', 'exists:rigs,id'],
             'drillTypeIds' => ['required', 'array', 'min:1'],
             'drillTypeIds.*' => ['integer', 'exists:drill_types,id'],
-            'eventTypeIds' => ['required', 'array', 'min:1'],
-            'eventTypeIds.*' => ['integer', 'exists:event_types,id'],
+            'eventTypeId' => ['required', 'integer', 'exists:event_types,id'],
             'drillDate' => ['required', 'date'],
             'drillTime' => ['nullable', 'date_format:H:i'],
             'onDutyCrews' => ['nullable', 'string'],
             'eventLocation' => ['nullable', 'string', 'max:255'],
             'scenario' => ['nullable', 'string'],
-            'applicableDsha' => ['nullable', 'string', 'max:255'],
+            'applicableDshaIds' => ['array'],
+            'applicableDshaIds.*' => ['integer', 'exists:dshas,id'],
             'performanceStandard' => ['nullable', 'string'],
             'performanceStandardsMet' => ['nullable', 'string', 'max:50'],
             'objectives' => ['nullable', 'string'],
@@ -296,24 +340,23 @@ class EditorPage extends Component
 
     private function persistDraft(DrillWorkflowService $workflowService): DrillRecord
     {
-        $record = $this->drillRecord ?? new DrillRecord();
+        $record = $this->drillRecord ?? new DrillRecord;
         $this->authorize($record->exists ? 'update' : 'create', $record->exists ? $record : DrillRecord::class);
 
         $validated = $this->validate();
         $drillTypeIds = $this->normalizeIds($validated['drillTypeIds']);
-        $eventTypeIds = $this->normalizeIds($validated['eventTypeIds']);
         $payload = [
             'rig_id' => $validated['rigId'],
             'drill_type_id' => $drillTypeIds[0],
-            'event_type_id' => $eventTypeIds[0],
+            'event_type_id' => $validated['eventTypeId'],
             'drill_type_ids' => $drillTypeIds,
-            'event_type_ids' => $eventTypeIds,
+            'event_type_ids' => [$validated['eventTypeId']],
             'drill_date' => $validated['drillDate'],
             'drill_time' => $validated['drillTime'],
             'on_duty_crews' => $validated['onDutyCrews'],
             'event_location' => $validated['eventLocation'],
             'scenario' => $validated['scenario'],
-            'applicable_dsha' => $validated['applicableDsha'],
+            'dsha_ids' => $this->normalizeIds($this->applicableDshaIds),
             'performance_standard' => $validated['performanceStandard'],
             'performance_standards_met' => $validated['performanceStandardsMet'],
             'objectives' => $validated['objectives'],
@@ -325,7 +368,7 @@ class EditorPage extends Component
 
         $record = $workflowService->saveDraft($record, $payload, auth()->user());
         $this->syncChildRecords($record);
-        $this->drillRecord = $record->fresh(['events', 'actions.status', 'attachments', 'status', 'drillTypes', 'eventTypes', 'workflowHistory.actor', 'workflowHistory.fromStatus', 'workflowHistory.toStatus']);
+        $this->drillRecord = $record->fresh(['events', 'actions.status', 'attachments', 'status', 'drillTypes', 'eventTypes', 'dshas', 'workflowHistory.actor', 'workflowHistory.fromStatus', 'workflowHistory.toStatus']);
 
         return $this->drillRecord;
     }
@@ -388,14 +431,14 @@ class EditorPage extends Component
     {
         $this->rigId = $record->rig_id;
         $this->drillTypeIds = $record->drillTypes->pluck('id')->all();
-        $this->eventTypeIds = $record->eventTypes->pluck('id')->all();
+        $this->eventTypeId = $record->event_type_id ?? $record->eventTypes->first()?->id;
         $this->statusId = $record->status_id;
         $this->drillDate = optional($record->drill_date)->format('Y-m-d');
         $this->drillTime = $record->drill_time ? $record->drill_time->format('H:i') : null;
         $this->onDutyCrews = $record->on_duty_crews;
         $this->eventLocation = $record->event_location;
         $this->scenario = $record->scenario;
-        $this->applicableDsha = $record->applicable_dsha;
+        $this->applicableDshaIds = $record->dshas->pluck('id')->all();
         $this->performanceStandard = $record->performance_standard;
         $this->performanceStandardsMet = $record->performance_standards_met;
         $this->objectives = $record->objectives;
@@ -424,10 +467,6 @@ class EditorPage extends Component
 
         if ($this->drillTypeIds === [] && $record->drill_type_id) {
             $this->drillTypeIds = [$record->drill_type_id];
-        }
-
-        if ($this->eventTypeIds === [] && $record->event_type_id) {
-            $this->eventTypeIds = [$record->event_type_id];
         }
     }
 

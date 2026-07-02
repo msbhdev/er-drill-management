@@ -28,7 +28,7 @@
                 <div class="grid gap-5 md:grid-cols-2">
                     <div>
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Rig</label>
-                        <select wire:model="rigId" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable || $rigs->count() === 1)>
+                        <select wire:model.live="rigId" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable || $rigs->count() === 1)>
                             @foreach ($rigs as $rig)
                                 <option value="{{ $rig->id }}">{{ $rig->name }}</option>
                             @endforeach
@@ -49,6 +49,18 @@
                         <input wire:model="eventLocation" type="text" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)>
                     </div>
                     <div>
+                        <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Event Type</label>
+                        <div class="mt-3 flex flex-wrap gap-6">
+                            @foreach ($eventTypes as $eventType)
+                                <label class="inline-flex items-center gap-2 text-sm font-medium text-stone-700">
+                                    <input wire:model="eventTypeId" type="radio" value="{{ $eventType->id }}" class="border-stone-300 text-[#2B2D8A] focus:ring-[#2B2D8A]" @disabled(! $editable)>
+                                    {{ $eventType->name }}
+                                </label>
+                            @endforeach
+                        </div>
+                        @error('eventTypeId') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                    </div>
+                    <div>
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Drill Type</label>
                         <x-multiselect-dropdown
                             :options="$drillTypes->map(fn ($t) => ['id' => $t->id, 'name' => $t->name])->all()"
@@ -60,18 +72,6 @@
                         @error('drillTypeIds') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                         @error('drillTypeIds.*') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
-                    <div>
-                        <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Event Type</label>
-                        <x-multiselect-dropdown
-                            :options="$eventTypes->map(fn ($t) => ['id' => $t->id, 'name' => $t->name])->all()"
-                            wire-model="eventTypeIds"
-                            placeholder="Select event types"
-                            search-placeholder="Search event types"
-                            :disabled="! $editable"
-                        />
-                        @error('eventTypeIds') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
-                        @error('eventTypeIds.*') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
-                    </div>
                     <div class="md:col-span-2">
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">On Duty Crews</label>
                         <textarea wire:model="onDutyCrews" rows="2" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
@@ -82,7 +82,15 @@
                     </div>
                     <div class="md:col-span-2">
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Applicable DSHA</label>
-                        <input wire:model="applicableDsha" type="text" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)>
+                        <x-multiselect-dropdown
+                            :options="$dshas->map(fn ($d) => ['id' => $d->id, 'name' => $d->code.' — '.$d->name])->all()"
+                            wire-model="applicableDshaIds"
+                            placeholder="Select applicable DSHA"
+                            search-placeholder="Search by code or name"
+                            :disabled="! $editable"
+                        />
+                        @error('applicableDshaIds') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
+                        @error('applicableDshaIds.*') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                     <div class="md:col-span-2">
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Performance Standard</label>
@@ -100,22 +108,6 @@
                     <div class="md:col-span-2">
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Objectives</label>
                         <textarea wire:model="objectives" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Debrief Attendees</label>
-                        <textarea wire:model="debriefAttendees" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Positive Observations</label>
-                        <textarea wire:model="positiveObservations" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Improvement Opportunities</label>
-                        <textarea wire:model="improvementOpportunities" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Other Comments</label>
-                        <textarea wire:model="otherComments" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
                     </div>
                 </div>
             </section>
@@ -141,6 +133,28 @@
             </section>
 
             <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
+                <h2 class="text-xl font-bold text-stone-950">Debrief</h2>
+                <div class="mt-5 grid gap-5 md:grid-cols-2">
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Debrief Attendees</label>
+                        <textarea wire:model="debriefAttendees" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Positive Observations</label>
+                        <textarea wire:model="positiveObservations" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Improvement Opportunities</label>
+                        <textarea wire:model="improvementOpportunities" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Other Comments/Recommendations</label>
+                        <textarea wire:model="otherComments" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
                 <div class="flex items-center justify-between">
                     <h2 class="text-xl font-bold text-stone-950">Follow-up Actions</h2>
                     @if ($editable)
@@ -153,7 +167,15 @@
                             <div class="md:col-span-2">
                                 <textarea wire:model="actions.{{ $index }}.action_description" rows="2" placeholder="Describe the action item" class="w-full rounded-2xl border-stone-300 bg-white text-sm" @disabled(! $editable)></textarea>
                             </div>
-                            <input wire:model="actions.{{ $index }}.action_owner" type="text" placeholder="Action owner" class="rounded-2xl border-stone-300 bg-white text-sm" @disabled(! $editable)>
+                            <select wire:model="actions.{{ $index }}.action_owner" class="rounded-2xl border-stone-300 bg-white text-sm" @disabled(! $editable)>
+                                <option value="">Select owner</option>
+                                @foreach ($actionOwners as $owner)
+                                    <option value="{{ $owner }}">{{ $owner }}</option>
+                                @endforeach
+                                @if (! empty($action['action_owner']) && ! in_array($action['action_owner'], $actionOwners, true))
+                                    <option value="{{ $action['action_owner'] }}">{{ $action['action_owner'] }}</option>
+                                @endif
+                            </select>
                             <select wire:model="actions.{{ $index }}.action_status_id" class="rounded-2xl border-stone-300 bg-white text-sm" @disabled(! $editable)>
                                 @foreach ($actionStatuses as $status)
                                     <option value="{{ $status->id }}">{{ $status->name }}</option>
@@ -307,12 +329,22 @@
                         @endif
 
                         @if ($canClose)
-                            <button wire:click="closeRecord" type="button"
-                                    style="width: 100%; border-radius: 0.875rem; background: #047857; padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: white; border: none; cursor: pointer; box-shadow: 0 6px 18px rgba(4,120,87,0.28); transition: opacity 0.15s;"
-                                    onmouseover="this.style.opacity='0.9';"
-                                    onmouseout="this.style.opacity='1';">
-                                Close Drill
-                            </button>
+                            @if ($hasOpenActions)
+                                <button type="button" disabled
+                                        style="width: 100%; border-radius: 0.875rem; background: #e5e7eb; padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: #9ca3af; border: none; cursor: not-allowed;">
+                                    Close Drill
+                                </button>
+                                <p style="margin-top: 0.5rem; font-size: 0.8125rem; line-height: 1.5; color: #a85416;">
+                                    All follow-up actions must be marked <strong>Closed</strong> before this drill can be closed.
+                                </p>
+                            @else
+                                <button wire:click="closeRecord" type="button"
+                                        style="width: 100%; border-radius: 0.875rem; background: #047857; padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: white; border: none; cursor: pointer; box-shadow: 0 6px 18px rgba(4,120,87,0.28); transition: opacity 0.15s;"
+                                        onmouseover="this.style.opacity='0.9';"
+                                        onmouseout="this.style.opacity='1';">
+                                    Close Drill
+                                </button>
+                            @endif
                         @endif
                     </div>
 

@@ -6,6 +6,7 @@ use App\Models\AccountAppAccess;
 use App\Models\ActionStatus;
 use App\Models\DrillStatus;
 use App\Models\DrillType;
+use App\Models\Dsha;
 use App\Models\EventType;
 use App\Models\Rig;
 use App\Models\User;
@@ -23,40 +24,75 @@ class SettingsPage extends Component
     public string $userSearch = '';
 
     public string $userRecordsPerPage = '5';
+
     public string $rigRecordsPerPage = '5';
+
     public string $drillTypeRecordsPerPage = '5';
+
     public string $eventTypeRecordsPerPage = '5';
 
+    public string $dshaRecordsPerPage = '5';
+
     public ?int $editingUserId = null;
+
     public ?int $editingRigId = null;
+
     public string $userFullName = '';
+
     public string $userEmail = '';
+
     public string $userRole = 'STO';
+
     public ?int $userRigId = null;
+
     public string $userDescription = '';
+
     public bool $userActiveStatus = true;
+
     public bool $userHasAppAccess = true;
+
     public string $userCurrentAssigneeName = '';
+
     public string $userAssigneeEffectiveFrom = '';
+
     public string $userAssigneeEffectiveTo = '';
+
     public string $userAssigneeRemarks = '';
+
     public string $userPassword = '';
 
     public string $rigName = '';
+
     public string $rigCode = '';
+
     public string $rigLocation = '';
+
     public string $rigTimezone = 'Asia/Kuala_Lumpur';
 
     public ?int $editingDrillTypeId = null;
+
     public string $drillTypeName = '';
+
     public string $drillTypeDescription = '';
+
     public ?int $editingEventTypeId = null;
+
     public string $eventTypeName = '';
+
     public string $eventTypeDescription = '';
 
+    public ?int $editingDshaId = null;
+
+    public string $dshaCode = '';
+
+    public string $dshaName = '';
+
     public string $drillStatusName = '';
+
     public string $drillStatusCode = '';
+
     public string $actionStatusName = '';
+
     public string $actionStatusCode = '';
 
     public function mount(): void
@@ -312,6 +348,65 @@ class SettingsPage extends Component
         session()->flash('status', 'Event type deleted successfully.');
     }
 
+    public function saveDsha(): void
+    {
+        $validated = $this->validate([
+            'dshaCode' => ['required', 'string', 'max:50', Rule::unique('dshas', 'code')->ignore($this->editingDshaId)],
+            'dshaName' => ['required', 'string', 'max:255'],
+        ]);
+
+        if ($this->editingDshaId) {
+            Dsha::query()->findOrFail($this->editingDshaId)->update([
+                'code' => $validated['dshaCode'],
+                'name' => $validated['dshaName'],
+            ]);
+        } else {
+            Dsha::query()->create([
+                'code' => $validated['dshaCode'],
+                'name' => $validated['dshaName'],
+                'is_active' => true,
+            ]);
+        }
+
+        $this->resetDshaForm();
+        $this->resetPage('dshasPage');
+        session()->flash('status', 'DSHA saved successfully.');
+    }
+
+    public function editDsha(int $dshaId): void
+    {
+        $dsha = Dsha::query()->findOrFail($dshaId);
+
+        $this->editingDshaId = $dsha->id;
+        $this->dshaCode = $dsha->code;
+        $this->dshaName = $dsha->name;
+    }
+
+    public function cancelDshaEdit(): void
+    {
+        $this->resetDshaForm();
+    }
+
+    public function deleteDsha(int $dshaId): void
+    {
+        $dsha = Dsha::query()->findOrFail($dshaId);
+
+        if ($dsha->drillRecords()->exists()) {
+            session()->flash('status', 'This DSHA is already used by drill records and cannot be deleted.');
+
+            return;
+        }
+
+        $dsha->delete();
+
+        if ($this->editingDshaId === $dshaId) {
+            $this->resetDshaForm();
+        }
+
+        $this->resetPage('dshasPage');
+        session()->flash('status', 'DSHA deleted successfully.');
+    }
+
     public function saveDrillStatus(): void
     {
         $validated = $this->validate([
@@ -364,6 +459,12 @@ class SettingsPage extends Component
         $eventType->update(['is_active' => ! $eventType->is_active]);
     }
 
+    public function toggleDsha(int $dshaId): void
+    {
+        $dsha = Dsha::query()->findOrFail($dshaId);
+        $dsha->update(['is_active' => ! $dsha->is_active]);
+    }
+
     public function toggleDrillStatus(int $drillStatusId): void
     {
         $status = DrillStatus::query()->findOrFail($drillStatusId);
@@ -401,6 +502,11 @@ class SettingsPage extends Component
         $this->resetPage('eventTypesPage');
     }
 
+    public function updatedDshaRecordsPerPage(): void
+    {
+        $this->resetPage('dshasPage');
+    }
+
     public function render()
     {
         $userQuery = User::query()
@@ -420,6 +526,7 @@ class SettingsPage extends Component
         $rigQuery = Rig::query()->orderBy('name');
         $drillTypeQuery = DrillType::query()->orderBy('name');
         $eventTypeQuery = EventType::query()->orderBy('name');
+        $dshaQuery = Dsha::query()->orderBy('code');
 
         return view('livewire.admin.settings-page', [
             'users' => $userQuery->paginate(
@@ -437,6 +544,10 @@ class SettingsPage extends Component
             'eventTypes' => $eventTypeQuery->paginate(
                 $this->resolvePerPage($eventTypeQuery->toBase()->getCountForPagination(), $this->eventTypeRecordsPerPage),
                 pageName: 'eventTypesPage'
+            ),
+            'dshas' => $dshaQuery->paginate(
+                $this->resolvePerPage($dshaQuery->toBase()->getCountForPagination(), $this->dshaRecordsPerPage),
+                pageName: 'dshasPage'
             ),
             'drillStatuses' => DrillStatus::query()->orderBy('sort_order')->get(),
             'actionStatuses' => ActionStatus::query()->orderBy('sort_order')->get(),
@@ -477,6 +588,11 @@ class SettingsPage extends Component
     private function resetEventTypeForm(): void
     {
         $this->reset('editingEventTypeId', 'eventTypeName', 'eventTypeDescription');
+    }
+
+    private function resetDshaForm(): void
+    {
+        $this->reset('editingDshaId', 'dshaCode', 'dshaName');
     }
 
     private function syncCurrentAssignee(User $user): void

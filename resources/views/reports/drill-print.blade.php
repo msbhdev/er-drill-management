@@ -188,14 +188,10 @@
             <tr><th>Status</th><td>{{ $record->status->name }}</td></tr>
             <tr><th>Location</th><td>{{ $record->event_location }}</td></tr>
             <tr><th>Scenario</th><td>{{ $record->scenario }}</td></tr>
-            <tr><th>Applicable DSHA</th><td>{{ $record->applicable_dsha }}</td></tr>
+            <tr><th>Applicable DSHA</th><td>{{ $record->dshaLabels() }}</td></tr>
             <tr><th>Performance Standard</th><td>{{ $record->performance_standard }}</td></tr>
             <tr><th>Performance Result</th><td>{{ $record->performance_standards_met }}</td></tr>
             <tr><th>Objectives</th><td>{{ $record->objectives }}</td></tr>
-            <tr><th>Debrief Attendees</th><td>{{ $record->debrief_attendees }}</td></tr>
-            <tr><th>Positive Observations</th><td>{{ $record->positive_observations }}</td></tr>
-            <tr><th>Improvement Opportunities</th><td>{{ $record->improvement_opportunities }}</td></tr>
-            <tr><th>Other Comments</th><td>{{ $record->other_comments }}</td></tr>
         </table>
 
         <div class="section-title">Timeline Events</div>
@@ -218,6 +214,14 @@
                     </tr>
                 @endforelse
             </tbody>
+        </table>
+
+        <div class="section-title">Debrief</div>
+        <table>
+            <tr><th>Debrief Attendees</th><td>{{ $record->debrief_attendees }}</td></tr>
+            <tr><th>Positive Observations</th><td>{{ $record->positive_observations }}</td></tr>
+            <tr><th>Improvement Opportunities</th><td>{{ $record->improvement_opportunities }}</td></tr>
+            <tr><th>Other Comments/Recommendations</th><td>{{ $record->other_comments }}</td></tr>
         </table>
 
         <div class="section-title">Follow-up Actions</div>

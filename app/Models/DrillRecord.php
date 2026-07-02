@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\UserRole;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -93,6 +93,22 @@ class DrillRecord extends Model
         return $this->belongsToMany(EventType::class)->orderBy('name');
     }
 
+    public function dshas(): BelongsToMany
+    {
+        return $this->belongsToMany(Dsha::class, 'drill_record_dsha')->orderBy('code');
+    }
+
+    public function dshaLabels(): string
+    {
+        $dshas = $this->relationLoaded('dshas') ? $this->dshas : $this->dshas()->get();
+
+        if ($dshas->isEmpty()) {
+            return $this->applicable_dsha ?: 'Not set';
+        }
+
+        return $dshas->map(fn (Dsha $dsha) => $dsha->label())->implode('; ');
+    }
+
     public function status(): BelongsTo
     {
         return $this->belongsTo(DrillStatus::class);
@@ -126,6 +142,13 @@ class DrillRecord extends Model
     public function actions(): HasMany
     {
         return $this->hasMany(DrillAction::class)->orderBy('id');
+    }
+
+    public function hasOpenActions(): bool
+    {
+        return $this->actions()
+            ->whereHas('status', fn ($query) => $query->where('code', '!=', 'closed'))
+            ->exists();
     }
 
     public function attachments(): HasMany

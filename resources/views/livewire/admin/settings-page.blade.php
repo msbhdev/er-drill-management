@@ -314,6 +314,62 @@
         </section>
 
         <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h2 class="text-xl font-bold text-stone-950">{{ $editingDshaId ? 'Edit DSHA' : 'DSHA (Hazards)' }}</h2>
+                <label class="flex items-center gap-3 text-sm text-stone-600">
+                    <span>Show</span>
+                    <span class="inline-flex flex-wrap gap-2">
+                        @foreach ($pageSizeOptions as $option)
+                            <button
+                                wire:click="$set('dshaRecordsPerPage', '{{ $option }}')"
+                                type="button"
+                                class="rounded-full px-4 py-2 text-sm font-semibold transition {{ $dshaRecordsPerPage === $option ? 'bg-stone-900 text-white' : 'border border-stone-300 bg-white text-stone-700' }}"
+                            >
+                                {{ $option === 'all' ? 'All' : $option }}
+                            </button>
+                        @endforeach
+                    </span>
+                </label>
+            </div>
+            <div class="mt-5 grid gap-4 sm:grid-cols-[160px_1fr]">
+                <div>
+                    <input wire:model="dshaCode" type="text" placeholder="Hazard code" class="w-full rounded-2xl border-stone-300 bg-stone-50 text-sm">
+                    @error('dshaCode') <div class="mt-1 text-sm text-rose-600">{{ $message }}</div> @enderror
+                </div>
+                <div>
+                    <input wire:model="dshaName" type="text" placeholder="Hazard name" class="w-full rounded-2xl border-stone-300 bg-stone-50 text-sm">
+                    @error('dshaName') <div class="mt-1 text-sm text-rose-600">{{ $message }}</div> @enderror
+                </div>
+            </div>
+            <div class="mt-4 flex gap-3">
+                <button wire:click="saveDsha" type="button" class="rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold text-white">{{ $editingDshaId ? 'Update DSHA' : 'Add DSHA' }}</button>
+                @if ($editingDshaId)
+                    <button wire:click="cancelDshaEdit" type="button" class="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-700">Cancel</button>
+                @endif
+            </div>
+            <div class="mt-5 max-h-[22.5rem] space-y-3 overflow-y-auto pr-1">
+                @foreach ($dshas as $dsha)
+                    <div class="flex items-center justify-between rounded-3xl border border-stone-200 bg-stone-50 p-4">
+                        <div>
+                            <div class="font-semibold text-stone-900">{{ $dsha->code }} — {{ $dsha->name }}</div>
+                            <div class="text-sm text-stone-500">{{ $dsha->is_active ? 'Active' : 'Disabled' }}</div>
+                        </div>
+                        <div class="flex flex-wrap justify-end gap-2">
+                            <button wire:click="editDsha({{ $dsha->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">Edit</button>
+                            <button wire:click="toggleDsha({{ $dsha->id }})" type="button" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700">
+                                {{ $dsha->is_active ? 'Disable' : 'Enable' }}
+                            </button>
+                            <button wire:click="deleteDsha({{ $dsha->id }})" type="button" class="rounded-full border border-rose-200 px-4 py-2 text-xs font-semibold text-rose-700">Delete</button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <div class="mt-4">
+                {{ $dshas->links() }}
+            </div>
+        </section>
+
+        <section class="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-xl shadow-stone-900/5 backdrop-blur">
             <h2 class="text-xl font-bold text-stone-950">Configurable Statuses</h2>
             <div class="grid gap-6 lg:grid-cols-2">
                 <div>

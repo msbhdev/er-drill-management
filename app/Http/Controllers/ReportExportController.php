@@ -17,15 +17,13 @@ class ReportExportController extends Controller
 {
     use AuthorizesRequests;
 
-    public function __construct(private readonly DrillReportService $reportService)
-    {
-    }
+    public function __construct(private readonly DrillReportService $reportService) {}
 
     public function excel(Request $request): StreamedResponse
     {
         $records = $this->reportService->queryForUser($request->user(), $request->all())->get();
 
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->fromArray([
             ['Reference', 'Rig', 'Date', 'Drill Type', 'Event Type', 'Status', 'Performance Result', 'Location'],
@@ -79,6 +77,7 @@ class ReportExportController extends Controller
             'eventType',
             'drillTypes',
             'eventTypes',
+            'dshas',
             'status',
             'events',
             'actions.status',
@@ -105,6 +104,7 @@ class ReportExportController extends Controller
             'eventType',
             'drillTypes',
             'eventTypes',
+            'dshas',
             'status',
             'events',
             'actions.status',
