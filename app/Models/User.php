@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -66,6 +67,25 @@ class User extends Authenticatable
     public function rig(): BelongsTo
     {
         return $this->belongsTo(Rig::class, 'rig_code', 'code');
+    }
+
+    /**
+     * Route notifications to the app-owned model (default connection) rather
+     * than letting them inherit this model's shared `auth` connection.
+     */
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')->latest();
+    }
+
+    public function readNotifications(): MorphMany
+    {
+        return $this->notifications()->whereNotNull('read_at');
+    }
+
+    public function unreadNotifications(): MorphMany
+    {
+        return $this->notifications()->whereNull('read_at');
     }
 
     public function roleHistory(): HasMany

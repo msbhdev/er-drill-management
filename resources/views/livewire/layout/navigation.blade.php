@@ -72,6 +72,8 @@ new class extends Component
         </div>
 
         <div class="nav-desktop-actions">
+            <livewire:layout.notifications-dropdown />
+
             <div style="border-radius: 1rem; border: 1px solid rgba(43,45,138,0.1); background: #F7F8FC; padding: 0.5rem 1rem; text-align: right;">
                 <div style="font-size: 0.875rem; font-weight: 700; color: #1A1C5E;">{{ auth()->user()->full_name }}</div>
                 <div style="font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase; color: #2B2D8A; font-weight: 600;">

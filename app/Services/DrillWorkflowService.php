@@ -10,6 +10,8 @@ use App\Models\DrillWorkflowHistory;
 use App\Models\Rig;
 use App\Models\User;
 use App\Notifications\DrillApprovedNotification;
+use App\Notifications\DrillReturnedByBeNotification;
+use App\Notifications\DrillReturnedByOimNotification;
 use App\Notifications\DrillSubmittedNotification;
 use App\Notifications\DrillVerifiedNotification;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -113,7 +115,7 @@ class DrillWorkflowService
             $drillRecord->save();
 
             $this->recordHistory($drillRecord, $action, $actor, $fromStatus, $toStatus, $historyComment ?: $comments);
-            $this->sendNotifications($drillRecord->fresh(['rig', 'drillType', 'eventType', 'drillTypes', 'eventTypes', 'stoUser', 'beUser', 'oimUser']), $targetCode);
+            $this->sendNotifications($drillRecord->fresh(['rig', 'drillType', 'eventType', 'drillTypes', 'eventTypes', 'stoUser', 'beUser', 'oimUser']), $targetCode, $historyComment ?: $comments);
 
             return $drillRecord->fresh(['status', 'rig', 'drillType', 'eventType', 'drillTypes', 'eventTypes', 'workflowHistory']);
         });
@@ -190,10 +192,18 @@ class DrillWorkflowService
         return Str::upper(sprintf('%s-%s-%s', $prefix, now()->format('Ymd-His'), Str::padLeft((string) random_int(0, 999), 3, '0')));
     }
 
-    private function sendNotifications(DrillRecord $drillRecord, string $statusCode): void
+    private function sendNotifications(DrillRecord $drillRecord, string $statusCode, ?string $comments = null): void
     {
         if ($statusCode === 'submitted' && $drillRecord->beUser) {
             $drillRecord->beUser->notify(new DrillSubmittedNotification($drillRecord));
+        }
+
+        if ($statusCode === 'returned_by_be' && $drillRecord->stoUser) {
+            $drillRecord->stoUser->notify(new DrillReturnedByBeNotification($drillRecord, $comments));
+        }
+
+        if ($statusCode === 'returned_by_oim' && $drillRecord->stoUser) {
+            $drillRecord->stoUser->notify(new DrillReturnedByOimNotification($drillRecord, $comments));
         }
 
         if ($statusCode === 'verified' && $drillRecord->oimUser) {

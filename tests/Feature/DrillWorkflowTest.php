@@ -264,6 +264,54 @@ class DrillWorkflowTest extends TestCase
         $this->assertSame('closed', $closed->status->code);
     }
 
+    public function test_workflow_transitions_create_in_app_notifications(): void
+    {
+        $rig = Rig::factory()->create();
+        $sto = User::factory()->create(['role' => UserRole::STO->value, 'rig_id' => $rig->id]);
+        $be = User::factory()->create(['role' => UserRole::BE->value, 'rig_id' => $rig->id]);
+        $oim = User::factory()->create(['role' => UserRole::OIM->value, 'rig_id' => $rig->id]);
+        $drillType = DrillType::query()->create(['name' => 'Fire Drill', 'is_active' => true]);
+        $eventType = EventType::query()->create(['name' => 'Fire', 'is_active' => true]);
+        $service = app(DrillWorkflowService::class);
+
+        $record = $service->saveDraft(new DrillRecord, [
+            'rig_id' => $rig->id,
+            'drill_type_id' => $drillType->id,
+            'event_type_id' => $eventType->id,
+            'drill_type_ids' => [$drillType->id],
+            'event_type_ids' => [$eventType->id],
+            'drill_date' => now()->toDateString(),
+        ], $sto);
+
+        $record = $service->submit($record->fresh('status'), $sto);
+        $this->assertSame(1, $be->unreadNotifications()->count());
+        $this->assertSame('submitted', $be->notifications()->latest()->first()->data['type']);
+
+        $record = $service->verify($record->fresh('status'), $be, 'Looks good.');
+        $this->assertSame(1, $oim->unreadNotifications()->count());
+        $this->assertSame('verified', $oim->notifications()->latest()->first()->data['type']);
+
+        $service->returnByOim($record->fresh('status'), $oim, 'Please correct the timeline.');
+        $stoNotif = $sto->notifications()->latest()->first();
+        $this->assertSame('returned_by_oim', $stoNotif->data['type']);
+        $this->assertSame('Please correct the timeline.', $stoNotif->data['comments']);
+    }
+
+    public function test_notifications_dropdown_marks_all_as_read(): void
+    {
+        $record = $this->approvedDrill();
+        $be = User::query()->findOrFail($record->be_user_id);
+
+        $this->assertGreaterThan(0, $be->unreadNotifications()->count());
+
+        $this->actingAs($be);
+
+        Livewire::test('layout.notifications-dropdown')
+            ->call('markAllRead');
+
+        $this->assertSame(0, $be->fresh()->unreadNotifications()->count());
+    }
+
     public function test_drill_pdf_download_works_for_visible_record(): void
     {
         Storage::fake('public');
