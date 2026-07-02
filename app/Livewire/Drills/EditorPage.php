@@ -189,6 +189,8 @@ class EditorPage extends Component
 
     public function submit(DrillWorkflowService $workflowService): void
     {
+        $this->validate($this->submitRules());
+
         $record = $this->persistDraft($workflowService);
         $this->authorize('submit', $record);
         $workflowService->submit($record, auth()->user());
@@ -335,6 +337,44 @@ class EditorPage extends Component
             'newAttachments.*' => ['nullable', 'image', 'max:1536'],
             'newAttachmentCaptions' => ['array'],
             'newAttachmentCaptions.*' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    /**
+     * Stricter rules enforced only on submit — the whole details section must
+     * be complete. Save Draft keeps the lenient rules() above.
+     */
+    protected function submitRules(): array
+    {
+        return [
+            'rigId' => ['required', 'exists:rigs,id'],
+            'drillDate' => ['required', 'date'],
+            'drillTime' => ['required', 'date_format:H:i'],
+            'eventLocation' => ['required', 'string', 'max:255'],
+            'eventTypeId' => ['required', 'integer', 'exists:event_types,id'],
+            'drillTypeIds' => ['required', 'array', 'min:1'],
+            'onDutyCrews' => ['required', 'string'],
+            'scenario' => ['required', 'string'],
+            'applicableDshaIds' => ['required', 'array', 'min:1'],
+            'performanceStandard' => ['required', 'string'],
+            'performanceStandardsMet' => ['required', 'string', 'max:50'],
+            'objectives' => ['required', 'string'],
+        ];
+    }
+
+    protected function validationAttributes(): array
+    {
+        return [
+            'rigId' => 'rig',
+            'drillDate' => 'drill date',
+            'drillTime' => 'drill time',
+            'eventLocation' => 'event location',
+            'eventTypeId' => 'event type',
+            'drillTypeIds' => 'drill type',
+            'onDutyCrews' => 'on duty crews',
+            'applicableDshaIds' => 'applicable DSHA',
+            'performanceStandard' => 'performance standard',
+            'performanceStandardsMet' => 'performance result',
         ];
     }
 

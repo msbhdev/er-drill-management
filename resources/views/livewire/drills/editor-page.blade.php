@@ -43,10 +43,12 @@
                     <div>
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Drill Time</label>
                         <input wire:model="drillTime" type="time" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)>
+                        @error('drillTime') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Event Location</label>
                         <input wire:model="eventLocation" type="text" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)>
+                        @error('eventLocation') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Event Type</label>
@@ -75,10 +77,12 @@
                     <div class="md:col-span-2">
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">On Duty Crews</label>
                         <textarea wire:model="onDutyCrews" rows="2" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
+                        @error('onDutyCrews') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                     <div class="md:col-span-2">
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Scenario</label>
                         <textarea wire:model="scenario" rows="4" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
+                        @error('scenario') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                     <div class="md:col-span-2">
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Applicable DSHA</label>
@@ -95,6 +99,7 @@
                     <div class="md:col-span-2">
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Performance Standard</label>
                         <textarea wire:model="performanceStandard" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
+                        @error('performanceStandard') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Performance Result</label>
@@ -104,10 +109,12 @@
                             <option value="No">No</option>
                             <option value="Partial">Partial</option>
                         </select>
+                        @error('performanceStandardsMet') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                     <div class="md:col-span-2">
                         <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Objectives</label>
                         <textarea wire:model="objectives" rows="3" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" @disabled(! $editable)></textarea>
+                        @error('objectives') <div class="mt-2 text-sm text-rose-600">{{ $message }}</div> @enderror
                     </div>
                 </div>
             </section>

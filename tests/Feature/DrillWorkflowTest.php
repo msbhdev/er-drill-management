@@ -181,6 +181,55 @@ class DrillWorkflowTest extends TestCase
         $this->assertEqualsCanonicalizing($dshas->pluck('id')->all(), $record->dshas->pluck('id')->all());
     }
 
+    public function test_submit_requires_all_details_fields(): void
+    {
+        [$rig, $sto, $drillType, $eventType] = $this->drillFormContext();
+
+        $this->actingAs($sto);
+
+        Livewire::test(EditorPage::class)
+            ->set('rigId', $rig->id)
+            ->set('drillTypeIds', [$drillType->id])
+            ->set('eventTypeId', $eventType->id)
+            ->set('drillDate', now()->toDateString())
+            ->call('submit')
+            ->assertHasErrors([
+                'drillTime', 'eventLocation', 'onDutyCrews', 'scenario',
+                'applicableDshaIds', 'performanceStandard', 'performanceStandardsMet', 'objectives',
+            ]);
+
+        $this->assertSame(0, DrillRecord::query()->count());
+    }
+
+    public function test_submit_succeeds_when_all_details_provided(): void
+    {
+        $rig = Rig::factory()->create();
+        $sto = User::factory()->create(['role' => UserRole::STO->value, 'rig_id' => $rig->id]);
+        $drillType = DrillType::query()->create(['name' => 'Fire Drill', 'is_active' => true]);
+        $eventType = EventType::query()->create(['name' => 'Fire', 'is_active' => true]);
+        $dsha = Dsha::query()->orderBy('code')->firstOrFail();
+
+        $this->actingAs($sto);
+
+        Livewire::test(EditorPage::class)
+            ->set('rigId', $rig->id)
+            ->set('drillTypeIds', [$drillType->id])
+            ->set('eventTypeId', $eventType->id)
+            ->set('drillDate', now()->toDateString())
+            ->set('drillTime', '09:30')
+            ->set('eventLocation', 'Muster Station A')
+            ->set('onDutyCrews', 'Crew A')
+            ->set('scenario', 'Fire in the engine room')
+            ->set('applicableDshaIds', [$dsha->id])
+            ->set('performanceStandard', 'Respond within 5 minutes')
+            ->set('performanceStandardsMet', 'Yes')
+            ->set('objectives', 'Test muster response times')
+            ->call('submit')
+            ->assertHasNoErrors();
+
+        $this->assertSame('submitted', DrillRecord::query()->firstOrFail()->status->code);
+    }
+
     public function test_approved_drill_cannot_be_saved_back_to_draft(): void
     {
         $record = $this->approvedDrill();
