@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DrillAttachmentDownloadController;
 use App\Http\Controllers\ReportExportController;
+use App\Livewire\Admin\ArchivedDrillsPage;
 use App\Livewire\Admin\SettingsPage;
 use App\Livewire\DashboardPage;
 use App\Livewire\Drills\EditorPage;
@@ -52,6 +53,10 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::get('admin/settings', SettingsPage::class)
         ->middleware('role:Administrator')
         ->name('admin.settings');
+
+    Route::get('admin/deleted-drills', ArchivedDrillsPage::class)
+        ->middleware('role:Administrator')
+        ->name('admin.deleted-drills');
 });
 
 require __DIR__.'/auth.php';

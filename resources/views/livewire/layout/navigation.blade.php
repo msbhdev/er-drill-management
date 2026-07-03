@@ -28,7 +28,8 @@ new class extends Component
         ['route' => 'dashboard', 'label' => 'Dashboard', 'pattern' => 'dashboard', 'show' => true],
         ['route' => 'drills.index', 'label' => 'Drills', 'pattern' => 'drills.*', 'show' => true],
         ['route' => 'reports.index', 'label' => 'Reports', 'pattern' => 'reports.*', 'show' => in_array(auth()->user()->role, ['RM', 'Management', 'Administrator'], true)],
-        ['route' => 'admin.settings', 'label' => 'Admin', 'pattern' => 'admin.*', 'show' => auth()->user()->role === 'Administrator'],
+        ['route' => 'admin.settings', 'label' => 'Admin', 'pattern' => 'admin.settings', 'show' => auth()->user()->role === 'Administrator'],
+        ['route' => 'admin.deleted-drills', 'label' => 'Deleted Drills', 'pattern' => 'admin.deleted-drills', 'show' => auth()->user()->role === 'Administrator'],
     ];
 @endphp
 

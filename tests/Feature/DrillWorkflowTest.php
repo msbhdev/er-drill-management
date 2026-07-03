@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\UserRole;
+use App\Livewire\Admin\ArchivedDrillsPage;
 use App\Livewire\Drills\EditorPage;
 use App\Livewire\Drills\IndexPage;
 use App\Models\ActionStatus;
@@ -534,6 +535,44 @@ class DrillWorkflowTest extends TestCase
             ->assertForbidden();
 
         $this->assertTrue(DrillRecord::query()->whereKey($record->id)->exists());
+    }
+
+    public function test_deleted_drill_archive_is_admin_only(): void
+    {
+        $rig = Rig::factory()->create();
+        $sto = User::factory()->create(['role' => UserRole::STO->value, 'rig_id' => $rig->id]);
+
+        $this->actingAs($sto);
+
+        Livewire::test(ArchivedDrillsPage::class)->assertForbidden();
+    }
+
+    public function test_admin_can_view_archived_drill_snapshot(): void
+    {
+        $archive = ArchivedDrillRecord::create([
+            'original_drill_id' => 999,
+            'reference_no' => 'REF-ARCHIVE-1',
+            'rig_name' => 'Alliance',
+            'status_name' => 'Closed',
+            'drill_date' => now()->toDateString(),
+            'snapshot' => [
+                'drill' => ['reference_no' => 'REF-ARCHIVE-1', 'scenario' => 'Archived scenario detail'],
+                'people' => [],
+            ],
+            'deleted_by_user_id' => 1,
+            'deleted_by_name' => 'Vantris Administrator',
+            'archived_at' => now(),
+        ]);
+
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        Livewire::test(ArchivedDrillsPage::class)
+            ->assertSee('REF-ARCHIVE-1')
+            ->assertSee('Vantris Administrator')
+            ->assertDontSee('Archived scenario detail')
+            ->call('viewArchive', $archive->id)
+            ->assertSee('Archived scenario detail');
     }
 
     public function test_delete_requires_matching_reference_number(): void
