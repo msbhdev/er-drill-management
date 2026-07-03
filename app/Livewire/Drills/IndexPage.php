@@ -7,6 +7,7 @@ use App\Models\DrillStatus;
 use App\Models\DrillType;
 use App\Models\EventType;
 use App\Models\Rig;
+use App\Services\DrillDeletionService;
 use App\Services\DrillReportService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
@@ -26,11 +27,57 @@ class IndexPage extends Component
     public ?string $dateFrom = null;
     public ?string $dateTo = null;
 
+    public bool $confirmingDeletion = false;
+    public ?int $deletingDrillId = null;
+    public string $deletingDrillReference = '';
+    public string $deleteConfirmationReference = '';
+
     public function updating($property): void
     {
         if (in_array($property, ['search', 'statusId', 'rigId', 'drillTypeId', 'eventTypeId', 'dateFrom', 'dateTo'], true)) {
             $this->resetPage();
         }
+    }
+
+    public function confirmDeletion(int $drillId): void
+    {
+        $drill = DrillRecord::query()->findOrFail($drillId);
+        $this->authorize('delete', $drill);
+
+        $this->deletingDrillId = $drill->id;
+        $this->deletingDrillReference = $drill->reference_no;
+        $this->deleteConfirmationReference = '';
+        $this->resetErrorBag('deleteConfirmationReference');
+        $this->confirmingDeletion = true;
+    }
+
+    public function cancelDeletion(): void
+    {
+        $this->confirmingDeletion = false;
+        $this->deletingDrillId = null;
+        $this->deletingDrillReference = '';
+        $this->deleteConfirmationReference = '';
+        $this->resetErrorBag('deleteConfirmationReference');
+    }
+
+    public function deleteDrill(DrillDeletionService $service): void
+    {
+        $drill = DrillRecord::query()->findOrFail($this->deletingDrillId);
+        $this->authorize('delete', $drill);
+
+        if (trim($this->deleteConfirmationReference) !== $drill->reference_no) {
+            $this->addError('deleteConfirmationReference', 'The reference number does not match. Type it exactly to confirm.');
+
+            return;
+        }
+
+        $reference = $drill->reference_no;
+        $service->delete($drill, auth()->user());
+
+        $this->cancelDeletion();
+        $this->resetPage();
+
+        session()->flash('status', "Drill {$reference} has been permanently deleted.");
     }
 
     public function render(DrillReportService $reportService)
@@ -55,6 +102,7 @@ class IndexPage extends Component
             'drillTypes' => DrillType::query()->where('is_active', true)->orderBy('name')->get(),
             'eventTypes' => EventType::query()->where('is_active', true)->orderBy('name')->get(),
             'canCreate' => Gate::allows('create', DrillRecord::class),
+            'canDelete' => $user->isAdministrator(),
         ])->layout('layouts.app');
     }
 }

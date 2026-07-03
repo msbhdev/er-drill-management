@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Livewire\Drills\EditorPage;
+use App\Livewire\Drills\IndexPage;
 use App\Models\ActionStatus;
+use App\Models\ArchivedDrillRecord;
 use App\Models\DrillAction;
 use App\Models\DrillAttachment;
 use App\Models\DrillRecord;
@@ -17,6 +19,7 @@ use App\Services\DrillWorkflowService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -468,6 +471,85 @@ class DrillWorkflowTest extends TestCase
         $this->get(route('attachments.show', $attachment))
             ->assertOk()
             ->assertDownload('evidence.png');
+    }
+
+    public function test_administrator_can_delete_a_drill_regardless_of_status(): void
+    {
+        Storage::fake('public');
+
+        $record = $this->approvedDrill();
+        Storage::disk('public')->put('drills/'.$record->id.'/evidence.png', 'fake image contents');
+
+        DrillAttachment::query()->create([
+            'drill_record_id' => $record->id,
+            'caption' => 'Evidence',
+            'file_path' => 'drills/'.$record->id.'/evidence.png',
+            'file_name' => 'evidence.png',
+            'file_size_kb' => 1,
+            'mime_type' => 'image/png',
+            'created_by_user_id' => $record->created_by_user_id,
+        ]);
+
+        // Approval already generated in-app notifications carrying this drill id.
+        $this->assertGreaterThan(0, DB::table('notifications')->where('data->drill_id', $record->id)->count());
+        $this->assertGreaterThan(0, $record->workflowHistory()->count());
+
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        Livewire::test(IndexPage::class)
+            ->call('confirmDeletion', $record->id)
+            ->set('deleteConfirmationReference', $record->reference_no)
+            ->call('deleteDrill')
+            ->assertHasNoErrors();
+
+        // The live record and its children are gone...
+        $this->assertFalse(DrillRecord::query()->whereKey($record->id)->exists());
+        $this->assertSame(0, DB::table('drill_workflow_histories')->where('drill_record_id', $record->id)->count());
+        $this->assertSame(0, DB::table('drill_attachments')->where('drill_record_id', $record->id)->count());
+        $this->assertSame(0, DB::table('notifications')->where('data->drill_id', $record->id)->count());
+
+        // ...but a full audit archive is retained, and the evidence file is kept.
+        Storage::disk('public')->assertExists('drills/'.$record->id.'/evidence.png');
+
+        $archive = ArchivedDrillRecord::query()->where('original_drill_id', $record->id)->firstOrFail();
+        $this->assertSame($record->reference_no, $archive->reference_no);
+        $this->assertSame($admin->id, $archive->deleted_by_user_id);
+        $this->assertNotNull($archive->archived_at);
+        $this->assertSame($record->reference_no, $archive->snapshot['drill']['reference_no']);
+        $this->assertCount(1, $archive->snapshot['attachments']);
+        $this->assertNotEmpty($archive->snapshot['workflow_history']);
+        $this->assertSame('drills/'.$record->id.'/evidence.png', $archive->snapshot['attachments'][0]['file_path']);
+    }
+
+    public function test_non_administrator_cannot_delete_a_drill(): void
+    {
+        $record = $this->approvedDrill();
+        $sto = User::query()->findOrFail($record->sto_user_id);
+
+        $this->actingAs($sto);
+
+        Livewire::test(IndexPage::class)
+            ->call('confirmDeletion', $record->id)
+            ->assertForbidden();
+
+        $this->assertTrue(DrillRecord::query()->whereKey($record->id)->exists());
+    }
+
+    public function test_delete_requires_matching_reference_number(): void
+    {
+        $record = $this->approvedDrill();
+        $admin = User::factory()->administrator()->create();
+
+        $this->actingAs($admin);
+
+        Livewire::test(IndexPage::class)
+            ->call('confirmDeletion', $record->id)
+            ->set('deleteConfirmationReference', 'WRONG-REF')
+            ->call('deleteDrill')
+            ->assertHasErrors('deleteConfirmationReference');
+
+        $this->assertTrue(DrillRecord::query()->whereKey($record->id)->exists());
     }
 
     private function drillFormContext(): array

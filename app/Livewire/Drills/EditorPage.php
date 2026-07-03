@@ -12,6 +12,7 @@ use App\Models\Dsha;
 use App\Models\EventType;
 use App\Models\Rig;
 use App\Models\User;
+use App\Services\DrillDeletionService;
 use App\Services\DrillWorkflowService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Gate;
@@ -69,6 +70,10 @@ class EditorPage extends Component
     public array $newAttachmentCaptions = [];
 
     public ?string $reviewComments = null;
+
+    public bool $confirmingDeletion = false;
+
+    public string $deleteConfirmationReference = '';
 
     public function mount(?DrillRecord $drillRecord = null): void
     {
@@ -132,6 +137,42 @@ class EditorPage extends Component
         $attachment->delete();
 
         $this->drillRecord->refresh()->load('attachments');
+    }
+
+    public function confirmDeletion(): void
+    {
+        abort_unless($this->drillRecord?->exists, 404);
+        $this->authorize('delete', $this->drillRecord);
+
+        $this->deleteConfirmationReference = '';
+        $this->resetErrorBag('deleteConfirmationReference');
+        $this->confirmingDeletion = true;
+    }
+
+    public function cancelDeletion(): void
+    {
+        $this->confirmingDeletion = false;
+        $this->deleteConfirmationReference = '';
+        $this->resetErrorBag('deleteConfirmationReference');
+    }
+
+    public function deleteDrill(DrillDeletionService $service)
+    {
+        abort_unless($this->drillRecord?->exists, 404);
+        $this->authorize('delete', $this->drillRecord);
+
+        if (trim($this->deleteConfirmationReference) !== $this->drillRecord->reference_no) {
+            $this->addError('deleteConfirmationReference', 'The reference number does not match. Type it exactly to confirm.');
+
+            return;
+        }
+
+        $reference = $this->drillRecord->reference_no;
+        $service->delete($this->drillRecord, auth()->user());
+
+        session()->flash('status', "Drill {$reference} has been permanently deleted.");
+
+        return $this->redirectRoute('drills.index', navigate: true);
     }
 
     public function addNewAttachment(): void
@@ -300,6 +341,7 @@ class EditorPage extends Component
             'canVerify' => $this->drillRecord ? Gate::allows('verify', $this->drillRecord) : false,
             'canApprove' => $this->drillRecord ? Gate::allows('approve', $this->drillRecord) : false,
             'canClose' => $this->drillRecord ? Gate::allows('close', $this->drillRecord) : false,
+            'canDelete' => $this->drillRecord ? Gate::allows('delete', $this->drillRecord) : false,
             'hasOpenActions' => $this->drillRecord ? $this->drillRecord->hasOpenActions() : false,
         ])->layout('layouts.app');
     }

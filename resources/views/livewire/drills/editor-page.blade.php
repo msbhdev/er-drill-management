@@ -363,6 +363,21 @@
                                   onblur="this.style.borderColor='rgba(43,45,138,0.18)'; this.style.background='#F7F8FC';"></textarea>
                         @error('reviewComments') <div style="margin-top: 0.5rem; font-size: 0.8125rem; color: #b45309;">{{ $message }}</div> @enderror
                     </div>
+
+                    @if ($canDelete)
+                        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(43,45,138,0.1);">
+                            <label style="display: block; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #b91c1c; margin-bottom: 0.5rem;">Danger Zone</label>
+                            <button wire:click="confirmDeletion" type="button"
+                                    style="width: 100%; border-radius: 0.875rem; border: 1px solid rgba(220,38,38,0.4); background: rgba(220,38,38,0.06); padding: 0.8rem 1rem; font-size: 0.875rem; font-weight: 700; color: #b91c1c; cursor: pointer; transition: background 0.15s;"
+                                    onmouseover="this.style.background='rgba(220,38,38,0.12)';"
+                                    onmouseout="this.style.background='rgba(220,38,38,0.06)';">
+                                Delete Drill Record
+                            </button>
+                            <p style="margin-top: 0.5rem; font-size: 0.8125rem; line-height: 1.5; color: #64748b;">
+                                Removes this drill from the workspace regardless of status. A full audit archive is retained; it cannot be edited or restored here.
+                            </p>
+                        </div>
+                    @endif
                 </div>
             </section>
 
@@ -397,6 +412,43 @@
             @endif
         </div>
     </div>
+
+    @if ($confirmingDeletion)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/40 p-4" wire:key="delete-modal">
+            <div class="w-full max-w-lg rounded-3xl border border-white/80 bg-white p-6 shadow-2xl">
+                <div class="flex items-start gap-3">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+                    </span>
+                    <div>
+                        <h2 class="text-lg font-bold text-stone-950">Delete drill record</h2>
+                        <p class="mt-1 text-sm text-stone-600">
+                            This removes <span class="font-semibold text-stone-900">{{ $record?->reference_no }}</span> from the workspace. A full audit archive (all fields, actions, and workflow history) is kept, and it can no longer be edited or restored here.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-5">
+                    <label class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Type <span class="font-mono normal-case tracking-normal text-stone-900">{{ $record?->reference_no }}</span> to confirm</label>
+                    <input wire:model="deleteConfirmationReference" wire:keydown.enter="deleteDrill" type="text" autocomplete="off" class="mt-2 w-full rounded-2xl border-stone-300 bg-stone-50 text-sm" placeholder="Reference number">
+                    @error('deleteConfirmationReference')
+                        <p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" wire:click="cancelDeletion" class="rounded-full border border-stone-300 px-5 py-2.5 text-sm font-semibold text-stone-700">
+                        Cancel
+                    </button>
+                    <button type="button" wire:click="deleteDrill" wire:loading.attr="disabled" class="rounded-full bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-600/20 hover:bg-red-700 disabled:opacity-60">
+                        Delete permanently
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 
 

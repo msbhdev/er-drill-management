@@ -28,6 +28,11 @@ class DrillRecordPolicy
         return $drillRecord->isEditableBy($user);
     }
 
+    public function delete(User $user, DrillRecord $drillRecord): bool
+    {
+        return $user->isAdministrator();
+    }
+
     public function submit(User $user, DrillRecord $drillRecord): bool
     {
         return $this->update($user, $drillRecord);
