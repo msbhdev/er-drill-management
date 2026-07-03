@@ -38,9 +38,14 @@
                             <td class="py-4">{{ $archive->deleted_by_name ?? '—' }}</td>
                             <td class="py-4">{{ $archive->archived_at?->format('d M Y, H:i') ?? '—' }}</td>
                             <td class="py-4 text-right">
-                                <button type="button" wire:click="viewArchive({{ $archive->id }})" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-100">
-                                    View
-                                </button>
+                                <div class="flex items-center justify-end gap-2">
+                                    <button type="button" wire:click="viewArchive({{ $archive->id }})" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-100">
+                                        View
+                                    </button>
+                                    <a href="{{ route('admin.deleted-drills.print', $archive) }}" target="_blank" rel="noopener" class="rounded-full border border-stone-300 px-4 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-100">
+                                        PDF
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -88,9 +93,14 @@
                             {{ $viewing->rig_name ?? '—' }} · {{ $viewing->status_name ?? 'Unknown' }} when deleted
                         </p>
                     </div>
-                    <button type="button" wire:click="closeArchive" class="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100">
-                        Close
-                    </button>
+                    <div class="flex shrink-0 items-center gap-2">
+                        <a href="{{ route('admin.deleted-drills.print', $viewing) }}" target="_blank" rel="noopener" class="rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-stone-900/15 hover:bg-stone-800">
+                            Print PDF
+                        </a>
+                        <button type="button" wire:click="closeArchive" class="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100">
+                            Close
+                        </button>
+                    </div>
                 </div>
 
                 <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-800">
@@ -180,15 +190,20 @@
                 @if (! empty($snapshot['attachments']))
                     <div class="mt-6 border-t border-stone-100 pt-5">
                         <h3 class="text-sm font-bold uppercase tracking-[0.16em] text-stone-700">Attachments</h3>
-                        <p class="mt-1 text-xs text-stone-500">Files are retained on the server; paths are recorded below for audit retrieval.</p>
+                        <p class="mt-1 text-xs text-stone-500">Files are retained on the server. Open a file to view or download it.</p>
                         <div class="mt-3 space-y-2">
                             @foreach ($snapshot['attachments'] as $attachment)
-                                <div class="rounded-2xl border border-stone-200 bg-stone-50 p-3 text-sm text-stone-700">
-                                    <div class="font-semibold text-stone-900">{{ $attachment['file_name'] ?? basename($attachment['file_path'] ?? '') }}</div>
-                                    @if (! empty($attachment['caption']))
-                                        <div class="text-xs text-stone-600">{{ $attachment['caption'] }}</div>
-                                    @endif
-                                    <div class="mt-1 break-all font-mono text-xs text-stone-400">{{ $attachment['file_path'] ?? '' }}</div>
+                                <div class="flex items-start justify-between gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-3 text-sm text-stone-700">
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-stone-900">{{ $attachment['file_name'] ?? basename($attachment['file_path'] ?? '') }}</div>
+                                        @if (! empty($attachment['caption']))
+                                            <div class="text-xs text-stone-600">{{ $attachment['caption'] }}</div>
+                                        @endif
+                                        <div class="mt-1 break-all font-mono text-xs text-stone-400">{{ $attachment['file_path'] ?? '' }}</div>
+                                    </div>
+                                    <a href="{{ route('admin.deleted-drills.attachment', ['archivedDrillRecord' => $viewing, 'index' => $loop->index]) }}" target="_blank" rel="noopener" class="shrink-0 rounded-full border border-stone-300 px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-100">
+                                        Open file
+                                    </a>
                                 </div>
                             @endforeach
                         </div>

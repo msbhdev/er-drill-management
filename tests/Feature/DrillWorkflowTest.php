@@ -16,6 +16,7 @@ use App\Models\Dsha;
 use App\Models\EventType;
 use App\Models\Rig;
 use App\Models\User;
+use App\Services\DrillDeletionService;
 use App\Services\DrillWorkflowService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -573,6 +574,65 @@ class DrillWorkflowTest extends TestCase
             ->assertDontSee('Archived scenario detail')
             ->call('viewArchive', $archive->id)
             ->assertSee('Archived scenario detail');
+    }
+
+    public function test_admin_can_print_an_archived_drill_as_pdf(): void
+    {
+        Storage::fake('public');
+
+        $record = $this->approvedDrill();
+        Storage::disk('public')->put('drills/'.$record->id.'/evidence.png', 'fake image contents');
+        DrillAttachment::query()->create([
+            'drill_record_id' => $record->id,
+            'caption' => 'Evidence',
+            'file_path' => 'drills/'.$record->id.'/evidence.png',
+            'file_name' => 'evidence.png',
+            'file_size_kb' => 1,
+            'mime_type' => 'image/png',
+            'created_by_user_id' => $record->created_by_user_id,
+        ]);
+
+        $admin = User::factory()->administrator()->create();
+        app(DrillDeletionService::class)->delete($record->fresh(), $admin);
+
+        $archive = ArchivedDrillRecord::query()->where('original_drill_id', $record->id)->firstOrFail();
+
+        $this->actingAs($admin)
+            ->get(route('admin.deleted-drills.print', $archive))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_admin_can_open_a_retained_archived_attachment(): void
+    {
+        Storage::fake('public');
+
+        $record = $this->approvedDrill();
+        Storage::disk('public')->put('drills/'.$record->id.'/evidence.png', 'fake image contents');
+        DrillAttachment::query()->create([
+            'drill_record_id' => $record->id,
+            'caption' => 'Evidence',
+            'file_path' => 'drills/'.$record->id.'/evidence.png',
+            'file_name' => 'evidence.png',
+            'file_size_kb' => 1,
+            'mime_type' => 'image/png',
+            'created_by_user_id' => $record->created_by_user_id,
+        ]);
+
+        $admin = User::factory()->administrator()->create();
+        app(DrillDeletionService::class)->delete($record->fresh(), $admin);
+        $archive = ArchivedDrillRecord::query()->where('original_drill_id', $record->id)->firstOrFail();
+
+        // The retained file opens for an admin...
+        $this->actingAs($admin)
+            ->get(route('admin.deleted-drills.attachment', ['archivedDrillRecord' => $archive, 'index' => 0]))
+            ->assertOk();
+
+        // ...but a non-admin is refused.
+        $sto = User::factory()->create(['role' => UserRole::STO->value]);
+        $this->actingAs($sto)
+            ->get(route('admin.deleted-drills.attachment', ['archivedDrillRecord' => $archive, 'index' => 0]))
+            ->assertForbidden();
     }
 
     public function test_delete_requires_matching_reference_number(): void

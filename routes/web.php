@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArchivedDrillAttachmentController;
 use App\Http\Controllers\DrillAttachmentDownloadController;
 use App\Http\Controllers\ReportExportController;
 use App\Livewire\Admin\ArchivedDrillsPage;
@@ -57,6 +58,15 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::get('admin/deleted-drills', ArchivedDrillsPage::class)
         ->middleware('role:Administrator')
         ->name('admin.deleted-drills');
+
+    Route::get('admin/deleted-drills/{archivedDrillRecord}/print', [ReportExportController::class, 'archivedDrillPdf'])
+        ->middleware('role:Administrator')
+        ->name('admin.deleted-drills.print');
+
+    Route::get('admin/deleted-drills/{archivedDrillRecord}/attachments/{index}', ArchivedDrillAttachmentController::class)
+        ->middleware('role:Administrator')
+        ->whereNumber('index')
+        ->name('admin.deleted-drills.attachment');
 });
 
 require __DIR__.'/auth.php';

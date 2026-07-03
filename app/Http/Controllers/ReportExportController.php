@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ArchivedDrillRecord;
 use App\Models\DrillAction;
 use App\Models\DrillRecord;
 use App\Services\DrillReportService;
@@ -119,6 +120,33 @@ class ReportExportController extends Controller
             'logoPath' => public_path('images/vantris-energy-berhad-logo.png'),
             'attachmentsForPdf' => $this->attachmentsForPdf($drillRecord),
         ])->stream("{$drillRecord->reference_no}.pdf");
+    }
+
+    public function archivedDrillPdf(Request $request, ArchivedDrillRecord $archivedDrillRecord)
+    {
+        abort_unless($request->user()?->isAdministrator(), 403);
+
+        return Pdf::loadView('reports.drill-print', [
+            'record' => $archivedDrillRecord->toDrillRecord(),
+            'logoPath' => public_path('images/vantris-energy-berhad-logo.png'),
+            'attachmentsForPdf' => $this->attachmentsFromSnapshot($archivedDrillRecord->snapshot['attachments'] ?? []),
+        ])->stream("{$archivedDrillRecord->reference_no}.pdf");
+    }
+
+    private function attachmentsFromSnapshot(array $attachments)
+    {
+        return collect($attachments)
+            ->map(function ($attachment) {
+                $filePath = $attachment['file_path'] ?? null;
+                $path = $filePath ? Storage::disk('public')->path($filePath) : null;
+
+                return [
+                    'caption' => $attachment['caption'] ?? null,
+                    'file_name' => $attachment['file_name'] ?? ($filePath ? basename($filePath) : 'attachment'),
+                    'preview_path' => $path && file_exists($path) && @getimagesize($path) ? $path : null,
+                ];
+            })
+            ->values();
     }
 
     private function attachmentsForPdf(DrillRecord $drillRecord)
